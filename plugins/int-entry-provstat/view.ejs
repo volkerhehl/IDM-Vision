@@ -1,0 +1,60 @@
+<div class="row">
+  <div class="col" id="vue-app">
+      <tooled-table :rows="rows" :columns="columns"></tooled-table>
+  </div>
+</div>
+
+<script>
+    var provStatus = <%- JSON.stringify(plugin.provStatus) %>
+</script>
+
+<script>
+    function makeTaskLink(row) {
+        const text = row.TaskName + ' (' + row.TaskID + ')'
+        return helper.makeJobTaskIdLink(row.TaskID, text)
+    }
+
+    var vapp = new Vue({
+        el: '#vue-app',
+        data: {
+            rows: provStatus,
+            columns: [
+                {
+                    title: 'Task Type',
+                    field: 'TaskType'
+                },
+                {
+                    title: 'Task',
+                    field: row => makeTaskLink(row)
+                },
+                {
+                    title: 'State',
+                    field: 'StateName'
+                },
+                {
+                    title: 'Executed',
+                    field: row => helper.dateFormat(row.ExecTime),
+                    sort: 'ExecTime'
+                },
+                {
+                    title: 'Retries',
+                    field: 'RetryCount',
+                    sort: 'RetryCount'
+                },
+                {
+                    title: 'Repository',
+                    field: 'RepositoryID'
+                },
+                {
+                    title: 'Message',
+                    field: 'MSG'
+                },
+                {
+                    title: 'Audit Ref',
+                    field: 'AuditRef',
+                    sort: 'AuditRef'
+                }
+            ]
+        }
+    })
+</script>

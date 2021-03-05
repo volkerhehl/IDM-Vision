@@ -1,0 +1,84 @@
+<% if (plugin.attributes) { %>
+    <div class="row">
+      <div class="col" id="vue-app">
+        <tooled-table :rows="rows" :columns="columns" :rightadd="rightadd"></tooled-table>
+      </div>
+    </div>
+
+    <script>
+        var attributes = <%- JSON.stringify(plugin.attributes) %>;
+        var cmpButton = <%- JSON.stringify(helper.compareButton()) %>;
+    </script>
+
+    <script>
+        var vapp = new Vue({
+            el: '#vue-app',
+            data: {
+                rows: attributes,
+                rightadd: cmpButton,
+                columns: [
+                    {
+                        title: 'Attribute',
+                        field: 'AttrName'
+                    },
+                    {
+                        title: 'Value',
+                        field: 'aValue'
+                    },
+                    {
+                        title: 'Last op.',
+                        field: row => row.Changetype == 2 ? 'insert' : 'modify'
+                    },
+                    {
+                        title: 'Modified',
+                        field: row => helper.dateFormat(row.Modifytime),
+                        sort: 'Modifytime'
+                    },
+                    {
+                        title: 'User ID',
+                        field: row => helper.makeProcessInfoLink(row.UserID)
+                    }
+                ]
+            }
+        })
+    </script>
+<% } %>
+
+<% if (plugin.compared) { %>
+    <%- include(views('snippets/compare-header'), { left: plugin.entry, right: plugin.compareEntry }) %>
+
+    <div class="row">
+      <div class="col" id="vue-app">
+        <diff-table :rows="rows" :columns="columns"></diff-table>
+      </div>
+    </div>
+
+    <script>
+        var compared = <%- JSON.stringify(plugin.compared) %>;
+    </script>
+
+    <script>
+        var vapp = new Vue({
+            el: '#vue-app',
+            data: {
+                rows: compared,
+                columns: [
+                    {
+                        title: 'Attribute',
+                        field: 'AttrName'
+                    },
+                    {
+                        title: 'Value',
+                        field: 'aValue'
+                    },
+                    {
+                        title: 'Modified',
+                        field: row => helper.dateFormat(row.Modifytime),
+                        sort: 'Modifytime',
+                        hidden: true
+                    }
+                ]
+            }
+        })
+    </script>
+<% } %>

@@ -1,0 +1,21 @@
+idp:
+  name: IDP
+  description: IDP - Produktion
+  realm: prod
+  dbtype: mssql
+  dbconfig:
+    server: idm.production.prod.dom
+    database: IDP_db
+    user: IDP_user
+    password: password***
+
+idd:
+  name: IDD
+  description: IDD - Development
+  realm: test
+  dbtype: mssql
+  dbconfig:
+    server: idm.production.prod.dom
+    database: IDD_db
+    user: IDD_user
+    password: password***

@@ -1,0 +1,11 @@
+<% if (menu) { %>
+  <ul class="nav nav-tabs">
+    <% for (let el of menu.content) { %>
+      <% if (el.type == 'item') { %>
+        <li class="nav-item">
+          <a class="nav-link<%= el.selected ? ' active' : '' %>" href="<%= el.link %>"><%= el.name %></a>
+        </li>
+      <% } %>
+    <% } %>
+  </ul>
+<% } %>

@@ -1,0 +1,136 @@
+<div class="row">
+  <div class="col">
+    <h4>Search Entry</h4>
+    <form role="form" action='/idm/<%= vars.idmId %>' method="GET">
+      <fieldset>
+        <div class="row">
+
+          <div class="col-2">
+            <div class="form-group">
+              <label for="idstoreField">ID Store</label>
+              <select class="form-control" name="idstore" id="idstoreField">
+                <% if (vars.searchIdstores) { %>
+                  <% for (let ids of vars.searchIdstores) { %>
+                    <option <%= vars.idstore && vars.idstore == ids.IS_ID ? 'selected' : '' %> value="<%= ids.IS_ID %>"><%= ids.IdStoreName %></option>
+                  <% } %>
+                <% } %>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-3">
+            <div class="form-group">
+              <label for="attrField">Attribute</label>
+              <select class="form-control" name="attribute" id="attrField">
+                <% if (vars.searchAttributes) { %>
+                  <% for (let attr of vars.searchAttributes) { %>
+                    <option <%= vars.attribute && vars.attribute == attr ? 'selected' : '' %>><%= attr %></option>
+                  <% } %>
+                <% } %>
+              </select>
+              <small class="form-text text-muted">Select attribute or search on any by * (asterisk)</small>
+            </div>
+          </div>
+
+          <div class="col-7">
+            <div class="form-group">
+              <label for="searchvalueField">Value</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="searchvalue" id="searchvalueField" aria-describedby="searchHelp" value="<%= vars.searchvalue %>">
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+              </div>
+              <small class="form-text text-muted">Use * (asterisk) to match zero or more characters</small>
+            </div>
+          </div>
+
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
+
+<% if (vars.entries) { %>
+  <div class="row">
+    <div class="col">
+      <% if (vars.entries.length > 0) { %>
+
+        <div class="row">
+          <div class="col" id="vue-app">
+            <tooled-table :rows="rows" :columns="columns"></tooled-table>
+          </div>
+        </div>
+
+        <script>
+            var entries = <%- JSON.stringify(vars.entries) %>;
+            var aValueAttr = <%- vars.aValueAttr ? JSON.stringify(vars.aValueAttr) : 'null' %>;
+        </script>
+
+        <script>
+            var columns = [
+                {
+                    title: 'Entry Type',
+                    field: 'MX_ENTRYTYPE'
+                },
+                {
+                    title: 'MSKEYVALUE',
+                    field: row => helper.makeMskeyLink(row.MSKEY, row.MSKEYVALUE)
+                },
+                {
+                    title: 'Display Name',
+                    field: 'DISPLAYNAME'
+                }
+            ]
+
+            if (aValueAttr) {
+                columns.push({
+                    title: aValueAttr ,
+                    field: 'aValue'
+                })
+            }
+
+            columns.push({
+                title: 'Created' ,
+                field: row => helper.dateFormat(row.mcCreated)
+            })
+
+            columns.push({
+                title: 'Last modified' ,
+                field: row => helper.dateFormat(row.mcLastModified)
+            })
+
+            var vapp = new Vue({
+                el: '#vue-app',
+                data: {
+                    rows: entries,
+                    columns: columns
+                }
+            })
+        </script>
+
+        <% if (vars.entries.length == vars.maxSearchRows) { %>
+          <span class="text-<%= vars.maxSearchRows < 50000 ? 'warning' : 'danger' %>">Search hits <%= vars.maxSearchRows %> entries limitation!</span>
+          <% if (vars.maxSearchRows < 50000) { %>
+            ... Load max. &nbsp;
+          <% } else { %>
+            ... Hack your own delimitation URL depending on your craziness.
+          <% } %>
+          <% if (vars.maxSearchRows < 5000) { %>
+            <a class="btn btn-outline-secondary btn-sm" href="<%= helper.entrySearchURL(vars.idstore, vars.attribute, vars.searchvalue, 5000) %>" role="button">5.000</a>
+          <% } %>
+          <% if (vars.maxSearchRows < 20000) { %>
+            <a class="btn btn-outline-warning btn-sm" href="<%= helper.entrySearchURL(vars.idstore, vars.attribute, vars.searchvalue, 20000) %>" role="button">20.000</a>
+          <% } %>
+          <% if (vars.maxSearchRows < 50000) { %>
+            <a class="btn btn-outline-danger btn-sm" href="<%= helper.entrySearchURL(vars.idstore, vars.attribute, vars.searchvalue, 50000) %>" role="button">50.000</a>
+          <% } %>
+        <% } else { %>
+          <%= vars.entries.length %> entries found.
+        <% } %>
+      <% } else { %>
+        No entries found!
+      <% } %>
+    </div>
+  </div>
+<% } %>

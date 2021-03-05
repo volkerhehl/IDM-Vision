@@ -1,0 +1,226 @@
+<div class="row">
+  <div class="col">
+    <h4>Job / Task</h4>
+    <div class="row">
+      <div class="col-3">
+        <form role="form" action="<%= thisURL %>" method="GET">
+          <fieldset>
+            <div class="form-group">
+              <label for="searchIdField">Find by ID</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="searchId" id="searchIdField" aria-describedby="searchHelp" value="<%= query.searchId %>">
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      <div class="col">
+        <form role="form" action="<%= thisURL %>" method="GET">
+          <fieldset>
+            <div class="form-group">
+              <label for="searchNameField">Find by name</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="searchName" id="searchNameField" aria-describedby="searchHelp" value="<%= query.searchName %>">
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+              </div>
+              <small id="searchHelp" class="form-text text-muted">Use * (asterisk) to match zero or more characters</small>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (plugin.searchResult) { %>
+  <div class="row">
+    <div class="col-6">
+      <h4>Job<%= plugin.jobList && plugin.jobList.length > 1 ? 's' : '' %></h4>
+      <% if (plugin.job || plugin.jobList ) { %>
+
+        <% if (plugin.job) { %>
+          <p>
+            <span class="text-success"><%= plugin.job.id %></span> / <span class="text-info"><%= plugin.job.name %></span>
+          </p>
+          <p>Location<br/>
+            <% for (let i in plugin.job.location) { %>
+              <% for (let ii = 0; ii < i; ii++) { %>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <% } %>
+              ➔ <span class="text-info"><%= plugin.job.location[i].name %></span><br/>
+            <% } %>
+          </p>
+        <% } %>
+
+        <% if (plugin.jobList) { %>
+          <div id="joblist-table-app">
+            <tooled-table :rows="rows" :columns="columns"></tooled-table>
+          </div>
+
+          <script>
+              var jobList = <%- JSON.stringify(plugin.jobList) %>;
+          </script>
+
+          <script>
+              var vapp = new Vue({
+                  el: '#joblist-table-app',
+                  data: {
+                      rows: jobList,
+                      columns: [
+                          {
+                              title: 'Job ID',
+                              field: row => helper.makeLink('<%- thisURL %>?searchId=' + row.JobId, row.JobId),
+                              sort: 'JobId'
+                          },
+                          {
+                              title: 'Job name',
+                              field: 'Name'
+                          }
+                      ]
+                  }
+              })
+          </script>
+        <% } %>
+
+      <% } else { %>
+        <p>No job found</p>
+      <% } %>
+    </div>
+
+    <div class="col-6">
+      <h4>Task<%= plugin.taskList && plugin.taskList.length > 1 ? 's' : '' %></h4>
+      <% if (plugin.task || plugin.taskList ) { %>
+
+        <% if (plugin.task) { %>
+          <p>
+            <span class="text-success"><%= plugin.task.id %></span> / <span class="text-info"><%= plugin.task.name %></span>
+          </p>
+          <p>Location<br/>
+            <% for (let i in plugin.task.location) { %>
+              <% for (let ii = 0; ii < i; ii++) { %>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <% } %>
+              ➔ <span class="text-info"><%= plugin.task.location[i].name %></span><br/>
+            <% } %>
+          </p>
+        <% } %>
+
+        <% if (plugin.taskList) { %>
+          <div id="tasklist-table-app">
+            <tooled-table :rows="rows" :columns="columns"></tooled-table>
+          </div>
+
+          <script>
+              var taskList = <%- JSON.stringify(plugin.taskList) %>
+          </script>
+
+          <script>
+              var vapp = new Vue({
+                  el: '#tasklist-table-app',
+                  data: {
+                      rows: taskList,
+                      columns: [
+                          {
+                              title: 'Task ID',
+                              field: row => helper.makeLink('<%- thisURL %>?searchId=' + row.TaskID, row.TaskID),
+                              sort: 'TaskID'
+                          },
+                          {
+                              title: 'Task name',
+                              field: 'TaskName'
+                          }
+                      ]
+                  }
+              })
+          </script>
+        <% } %>
+
+      <% } else { %>
+        <p>No task found</p>
+      <% } %>
+    </div>
+  </div>
+
+  <% if (plugin.job) { %>
+    <div class="row">
+      <div class="col" id="joblog-table-app">
+        <h4>Job Log</h4>
+        <poll-table :rows="[]" :columns="columns" :fadekey="fadekey" :rowclass="rowclass" :pollinterval="pollinterval" :pollfromtop="pollfromtop" :pollurl="pollurl"></poll-table>
+      </div>
+    </div>
+
+    <script>
+        var vapp = new Vue({
+            el: '#joblog-table-app',
+
+            data: {
+                rowclass: row => row.ERRS > 0 ? 'text-danger' : null,
+                fadekey: 'LOG_ID',
+                pollinterval: 10,
+                pollfromtop: 'LOG_ID',
+                pollurl: "<%- pollURL + '?jobId=' + plugin.job.id %>",
+
+                columns: [
+                    {
+                        title: 'Log ID',
+                        field: 'LOG_ID'
+                    },
+                    {
+                        title: 'Job',
+                        field: 'NAME'
+                    },
+                    {
+                        title: 'Date',
+                        field: row => helper.dateFormat(row.LOGDATE)
+                    },
+                    {
+                        title: 'Time used',
+                        field: 'TIME_USED'
+                    },
+                    {
+                        title: 'Total',
+                        field: 'TOTAL'
+                    },
+                    {
+                        title: 'Add',
+                        field: 'ADDS'
+                    },
+                    {
+                        title: 'Mod',
+                        field: 'MODS'
+                    },
+                    {
+                        title: 'Noop',
+                        field: 'NOOP'
+                    },
+                    {
+                        title: 'Del',
+                        field: 'DELS'
+                    },
+                    {
+                        title: 'Warn',
+                        field: row => row.WARNS > 0 ? helper.badge('warning', row.WARNS) : row.WARNS
+                    },
+                    {
+                        title: 'Err',
+                        field: row => row.ERRS > 0 ? helper.badge('danger', row.ERRS) : row.ERRS
+                    },
+                    {
+                        title: 'Dispatcher',
+                        field: 'DISPATCHER'
+                    },
+                    {
+                        title: 'Repo',
+                        field: 'REPOSITORYNAME'
+                    }
+                ]
+            }
+        })
+    </script>
+  <% } %>
+<% } %>

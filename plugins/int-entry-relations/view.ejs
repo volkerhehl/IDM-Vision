@@ -1,0 +1,335 @@
+<% if (plugin.fromEntry) { %>
+    <div class="row">
+      <div class="col" id="from-entry-table">
+        <h5>From this entry</h5>
+        <tooled-table :rows="rows" :columns="columns" :rightadd="rightadd"></tooled-table>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col" id="to-entry-table">
+        <h5>To this entry</h5>
+        <tooled-table :rows="rows" :columns="columns" :rightadd="rightadd"></tooled-table>
+      </div>
+    </div>
+
+    <script>
+        var fromEntry = <%- JSON.stringify(plugin.fromEntry) %>;
+        var toEntry = <%- JSON.stringify(plugin.toEntry) %>;
+        var cmpFromButton = <%- JSON.stringify(helper.compareButton("from")) %>;
+        var cmpToButton = <%- JSON.stringify(helper.compareButton("to")) %>;
+    </script>
+
+    <script>
+        function unistate(state) {
+            return state > 1023 ? state - 1024 : state
+        }
+
+
+        function linkStateName(state) {
+            const ustate = unistate(state)
+            const pending = state > 1023 ? 'PENDEL: ' + state : 'PENADD: ' + state
+
+            switch (ustate) {
+                case 0: return 'OKAY: ' + state
+                case 1: return 'OK: ' + state
+                case 2: return 'REJECT: ' + state
+                case 4: return 'FAIL: ' + state
+                case 512: return pending
+                default: return '???: ' + state
+            }
+        }
+
+
+        function execStateName(state) {
+            const ustate = unistate(state)
+            const pending = state > 1023 ? 'PENDEL: ' + state : 'PENADD: ' + state
+
+            switch (ustate) {
+                case 0: return 'OKAY: ' + state
+                case 1: return 'OK: ' + state
+                case 2: return 'REJECT: ' + state
+                case 3: return 'PARTOK: ' + state
+                case 4:
+                case 5:
+                case 6:
+                case 7: return 'FAIL: ' + state
+                case 512:
+                case 513:
+                case 514:
+                case 515:
+                case 516:
+                case 517:
+                case 518:
+                case 519: return pending
+                default: return '???: ' + state
+            }
+        }
+
+
+        function stateBadgeColor(state) {
+            const ustate = unistate(state)
+            if (ustate < 2) { return 'success' }
+            if (ustate > 3 && ustate < 512) { return 'danger' }
+            return 'warning'
+        }
+
+
+        function linkStateBadge(row) {
+            const state = Number(row.mcLinkState)
+            return helper.badge(stateBadgeColor(state), linkStateName(state))
+        }
+
+
+        function execStateBadge(row) {
+            const state = Number(row.mcExecState)
+            return helper.badge(stateBadgeColor(state), execStateName(state))
+        }
+
+        function refCounter(row) {
+            let result = []
+
+            function build(name, number) {
+                return '(' + name + ': ' + number + ')'
+            }
+
+            if (row.mcAssignedDirect > 0) {
+                result.push(build('dir', row.mcAssignedDirect))
+            }
+
+            if (row.mcAssignedDynamicGroup > 0) {
+                result.push(build('dg', row.mcAssignedDynamicGroup))
+            }
+
+            if (row.mcAssignedInheritCount > 0) {
+                result.push(build('inh', row.mcAssignedInheritCount))
+            }
+
+            return result.join(' ')
+        }
+
+
+        var vappFrom = new Vue({
+            el: '#from-entry-table',
+            data: {
+                rows: fromEntry,
+                rightadd: cmpFromButton,
+                columns: [
+                    {
+                        title: 'ID',
+                        field: 'mcUniqueID',
+                        sort: 'mcUniqueID'
+                    },
+                    {
+                        title: 'Attribute',
+                        field: 'AttrName'
+                    },
+                    {
+                        title: 'Type',
+                        field: 'entrytype',
+                        hidden: true,
+                    },
+                    {
+                        title: 'MSKEYVALUE',
+                        field: row => helper.makeMskeyLink(row.MSKEY, row.MSKEYVALUE)
+                    },
+                    {
+                        title: 'Displayname',
+                        field: 'DISPLAYNAME',
+                        hidden: true,
+                    },
+                    {
+                        title: 'Logonalias',
+                        field: 'LOGONALIAS',
+                        hidden: true,
+                    },
+                    {
+                        title: 'AD Object',
+                        field: 'AD_OBJECT',
+                        hidden: true,
+                    },
+                    {
+                        title: 'Firstname',
+                        field: 'MX_FIRSTNAME',
+                        hidden: true,
+                    },
+                    {
+                        title: 'Lastname',
+                        field: 'MX_LASTNAME',
+                        hidden: true,
+                    },
+                    {
+                        title: 'Reftype',
+                        field: row => refCounter(row)
+                    },
+                    {
+                        title: 'Valid from',
+                        field: row => helper.dateFormat(row.mcValidFrom),
+                        sort: 'mcValidFrom'
+                    },
+                    {
+                        title: 'Valid to',
+                        field: row => helper.dateFormat(row.mcValidTo),
+                        sort: 'mcValidTo'
+                    },
+                    {
+                        title: 'CTX',
+                        field: row => helper.makeMskeyLink(row.mcContextMSKEY, row.CTX)
+                    },
+                    {
+                        title: 'Modified',
+                        field: row => helper.dateFormat(row.mcModifyTime),
+                        sort: 'mcModifyTime'
+                    },
+                    {
+                        title: 'Process info',
+                        field: row => helper.makeProcessInfoLink(row.mcProcessInfo)
+                    },
+                    {
+                        title: 'Link',
+                        field: row => linkStateBadge(row)
+                    },
+                    {
+                        title: 'Exec',
+                        field: row => execStateBadge(row)
+                    }
+                ]
+            }
+        })
+
+        var vappTo = new Vue({
+            el: '#to-entry-table',
+            data: {
+                rows: toEntry,
+                rightadd: cmpToButton,
+                columns: [
+                    {
+                        title: 'ID',
+                        field: 'mcUniqueID',
+                        sort: 'mcUniqueID'
+                    },
+                    {
+                        title: 'Attribute',
+                        field: 'AttrName'
+                    },
+                    {
+                        title: 'Type',
+                        field: 'entrytype',
+                        hidden: true,
+                    },
+                    {
+                        title: 'MSKEYVALUE',
+                        field: row => helper.makeMskeyLink(row.MSKEY, row.MSKEYVALUE)
+                    },
+                    {
+                        title: 'Displayname',
+                        field: 'DISPLAYNAME',
+                        hidden: true,
+                    },
+                    {
+                        title: 'Logonalias',
+                        field: 'LOGONALIAS',
+                        hidden: true,
+                    },
+                    {
+                        title: 'AD Object',
+                        field: 'AD_OBJECT',
+                        hidden: true,
+                    },
+                    {
+                        title: 'Firstname',
+                        field: 'MX_FIRSTNAME',
+                        hidden: true,
+                    },
+                    {
+                        title: 'Lastname',
+                        field: 'MX_LASTNAME',
+                        hidden: true,
+                    },
+                    {
+                        title: 'Reftype',
+                        field: row => refCounter(row)
+                    },
+                    {
+                        title: 'Valid from',
+                        field: row => helper.dateFormat(row.mcValidFrom),
+                        sort: 'mcValidFrom'
+                    },
+                    {
+                        title: 'Valid to',
+                        field: row => helper.dateFormat(row.mcValidTo),
+                        sort: 'mcValidTo'
+                    },
+                    {
+                        title: 'CTX',
+                        field: row => helper.makeMskeyLink(row.mcContextMSKEY, row.CTX)
+                    },
+                    {
+                        title: 'Modified',
+                        field: row => helper.dateFormat(row.mcModifyTime),
+                        sort: 'mcModifyTime'
+                    },
+                    {
+                        title: 'Process info',
+                        field: row => helper.makeProcessInfoLink(row.mcProcessInfo)
+                    },
+                    {
+                        title: 'Link',
+                        field: row => linkStateBadge(row)
+                    },
+                    {
+                        title: 'Exec',
+                        field: row => execStateBadge(row)
+                    }
+                ]
+            }
+        })
+    </script>
+<% } %>
+
+<% if (plugin.compared) { %>
+    <%- include(views('snippets/compare-header'), {
+        left: plugin.entry,
+        right: plugin.compareEntry,
+        title: plugin.title
+    }) %>
+
+    <div class="row">
+      <div class="col" id="vue-app">
+        <diff-table :rows="rows" :columns="columns"></diff-table>
+      </div>
+    </div>
+
+    <script>
+        var compared = <%- JSON.stringify(plugin.compared) %>;
+    </script>
+
+    <script>
+        var vapp = new Vue({
+            el: '#vue-app',
+            data: {
+                rows: compared,
+                columns: [
+                    {
+                        title: 'Attribute',
+                        field: 'AttrName'
+                    },
+                    {
+                        title: 'Type',
+                        field: 'entrytype',
+                        hidden: true,
+                    },
+                    {
+                        title: 'MSKEYVALUE',
+                        field: row => helper.makeMskeyLink(row.MSKEY, row.MSKEYVALUE)
+                    },
+                    {
+                        title: 'Displayname',
+                        field: 'DISPLAYNAME',
+                        hidden: true,
+                    }
+                ]
+            }
+        })
+    </script>
+<% } %>

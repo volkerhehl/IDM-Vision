@@ -1,0 +1,52 @@
+customPluginPath: ../my-plugins
+port: 7000
+
+# auth:
+#   method: anonymous
+
+auth:
+  method: sspi
+  domain: myadsdomain
+  source: idp
+  userAttr: SAMACCOUNTNAME_ATTR
+  userNameAttr: DISPLAYNAME
+
+  entries:
+    superuser:
+      - PRIV:IDM:SUPERUSER
+    admin:
+      - PRIV:IDM:ADMIN
+
+  manual:
+    myrole:
+      - myadsdomain\user1
+      - myadsdomain\user2
+
+roles:
+  myrole:
+    description: My own role
+    privs:
+      - search-entry
+    groups:
+      - int-generic-plugin-group
+
+additionalTopSearchAttributes:
+  - DESCRIPTION
+  - PR_NAME_IN_TARGETSYSTEM
+
+# activate probes here
+# probes:
+#   interval: 60
+
+# currently only necessary for probes
+# influxdb:
+#   host: influxdb_host
+#   dbname: idm_database
+#   maxDowntimeMinutes: 10
+#   resetDowntimeMinutes: 180
+
+# plugin specific configurations
+plugins:
+  int-entry-attributes:
+    trimLongAttributes:
+      - MX_USER_PREFS

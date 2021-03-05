@@ -1,0 +1,71 @@
+<div class="row">
+  <div class="col" id="auditflags-table">
+    <h5>Audit flags</h5>
+    <tooled-table :rows="rows" :columns="columns"></tooled-table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col" id="history-table">
+    <h5>History</h5>
+    <tooled-table :rows="rows" :columns="columns"></tooled-table>
+  </div>
+</div>
+
+<script>
+    var auditFlags = <%- JSON.stringify(plugin.auditFlags) %>;
+    var afHistory = <%- JSON.stringify(plugin.afHistory) %>;
+</script>
+
+<script>
+    var vapp = new Vue({
+        el: '#auditflags-table',
+        data: {
+            rows: auditFlags,
+            columns: [
+                {
+                    title: 'Audit Flag ID',
+                    field: 'Auditflag_ID',
+                    sort: 'Auditflag_ID'
+                },
+                {
+                    title: 'Name',
+                    field: 'semaphorename'
+                },
+                {
+                    title: 'Updated time',
+                    field: row => helper.dateFormat(row.updtime),
+                    sort: 'updtime'
+                },
+                {
+                    title: 'Task audit message',
+                    field: row => helper.makeProcessInfoLink(row.mcmv_task_audit),
+                    sort: 'mcmv_task_audit'
+                }
+            ]
+        }
+    });
+
+    var vapp = new Vue({
+        el: '#history-table',
+        data: {
+            rows: afHistory,
+            columns: [
+                {
+                    title: 'Audit Flag ID',
+                    field: 'Auditflag_ID',
+                    sort: 'Auditflag_ID'
+                },
+                {
+                    title: 'Name',
+                    field: 'semaphorename'
+                },
+                {
+                    title: 'Updated time',
+                    field: row => helper.dateFormat(row.updtime),
+                    sort: 'updtime'
+                }
+            ]
+        }
+    });
+</script>

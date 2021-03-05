@@ -1,0 +1,43 @@
+<div class="row">
+  <div class="col">
+    <h5>Page Views</h5>
+
+    <div class="row">
+      <div class="col" id="pageviews-table">
+        <tooled-table :rows="rows" :columns="columns"></tooled-table>
+      </div>
+    </div>
+
+    <script>
+        var pageviews = <%- JSON.stringify(pageviews) %>
+    </script>
+
+    <script>
+        var vapp = new Vue({
+            el: '#pageviews-table',
+            data: {
+                rows: pageviews,
+                columns: [
+                    {
+                        title: 'Page view',
+                        field: row => helper.emphaseText(row.key,
+                            ['UNAUTHORIZED', 'danger'],
+                            ['admin', 'warning'],
+                            ['error', 'danger'],
+                            ['unsupported-ie', 'danger']
+                        )
+                    },
+                    {
+                        title: 'Count',
+                        field: 'counter'
+                    },
+                    {
+                        title: 'Last access',
+                        field: row => helper.dateFormat(row.last)
+                    }
+                ]
+            }
+        })
+    </script>
+  </div>
+</div>

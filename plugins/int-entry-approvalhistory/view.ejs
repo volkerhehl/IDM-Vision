@@ -1,0 +1,50 @@
+<div class="row">
+  <div class="col" id="vue-app">
+      <tooled-table :rows="rows" :columns="columns"></tooled-table>
+  </div>
+</div>
+
+<script>
+    var approvalHistory = <%- JSON.stringify(plugin.approvalHistory) %>
+</script>
+
+<script>
+    function makeTaskLink(row) {
+        const text = row.TaskName + ' (' + row.TASKID + ')'
+        return helper.makeJobTaskIdLink(row.TASKID, text)
+    }
+
+    var vapp = new Vue({
+        el: '#vue-app',
+        data: {
+            rows: approvalHistory,
+            columns: [
+                {
+                    title: 'Approved by',
+                    field: row => helper.makeMskeyLink(row.APPROVER, row.ApproverMSKV)
+                },
+                {
+                    title: 'Approver full name',
+                    field: 'ApproverDN'
+                },
+                {
+                    title: 'Approval task name',
+                    field: row => makeTaskLink(row)
+                },
+                {
+                    title: 'Approve time',
+                    field: row => helper.dateFormat(row.ApproveTime),
+                    sort: 'ApproveTime'
+                },
+                {
+                    title: 'Status',
+                    field: 'STATUS'
+                },
+                {
+                    title: 'Reason',
+                    field: 'REASON'
+                }
+            ]
+        }
+    })
+</script>

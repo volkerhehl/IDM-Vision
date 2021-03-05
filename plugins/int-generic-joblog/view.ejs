@@ -1,0 +1,75 @@
+<div class="row">
+  <div class="col" id="vue-app">
+    <h4>Job Log</h4>
+    <poll-table :rows="[]" :columns="columns" :fadekey="fadekey" :rowclass="rowclass" :pollinterval="pollinterval" :pollfromtop="pollfromtop" :pollurl="pollurl"></poll-table>
+  </div>
+</div>
+
+<script>
+    var vapp = new Vue({
+        el: '#vue-app',
+
+        data: {
+            rowclass: row => row.ERRS > 0 ? 'text-danger' : null,
+            fadekey: 'LOG_ID',
+            pollinterval: 5,
+            pollfromtop: 'LOG_ID',
+            pollurl: '<%- pollURL %>',
+
+            columns: [
+                {
+                    title: 'Log ID',
+                    field: 'LOG_ID'
+                },
+                {
+                    title: 'Job',
+                    field: row => helper.makeJobTaskIdLink(row.JOB_ID, row.NAME)
+                },
+                {
+                    title: 'Date',
+                    field: row => helper.dateFormat(row.LOGDATE)
+                },
+                {
+                    title: 'Time used',
+                    field: 'TIME_USED'
+                },
+                {
+                    title: 'Total',
+                    field: 'TOTAL'
+                },
+                {
+                    title: 'Add',
+                    field: 'ADDS'
+                },
+                {
+                    title: 'Mod',
+                    field: 'MODS'
+                },
+                {
+                    title: 'Noop',
+                    field: 'NOOP'
+                },
+                {
+                    title: 'Del',
+                    field: 'DELS'
+                },
+                {
+                    title: 'Warn',
+                    field: row => row.WARNS > 0 ? helper.badge('warning', row.WARNS) : row.WARNS
+                },
+                {
+                    title: 'Err',
+                    field: row => row.ERRS > 0 ? helper.badge('danger', row.ERRS) : row.ERRS
+                },
+                {
+                    title: 'Dispatcher',
+                    field: 'DISPATCHER'
+                },
+                {
+                    title: 'Repo',
+                    field: 'REPOSITORYNAME'
+                }
+            ]
+        }
+    })
+</script>

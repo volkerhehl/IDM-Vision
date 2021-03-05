@@ -1,0 +1,290 @@
+body {
+    color: #ccc;
+}
+
+.navbar {
+    padding: 0 1rem;
+}
+
+.row {
+    margin-top: 10px;
+}
+
+.form-control {
+    height: calc(1.0em + 0.75rem + 3px);
+    line-height: 1.0;
+    border: 0px;
+    font-size: 0.9rem;
+    background-color: #eee;
+}
+
+.btn {
+    line-height: 1;
+}
+
+.btn-sm {
+    padding: 0.1rem 0.3rem;
+    font-size: 0.82em;
+    vertical-align: baseline;
+}
+
+.btn-outline-secondary {
+    color: #aaa;
+    border-color: #aaa;
+}
+
+.custom-select {
+    height: calc(1.1em + 0.75rem + 2px);
+    line-height: 1.1;
+}
+
+.table {
+    color: #ccc;
+}
+
+.table-sm {
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.table thead {
+    color: #fff;
+    white-space: nowrap;
+}
+
+.nav-tabs .nav-link {
+    color: #aaa;
+    padding: 0.3rem 1rem;
+}
+
+.nav-tabs .nav-link.active {
+    color: #fff;
+    background-color: #444;
+}
+
+.nav-tabs {
+    margin-top: 16px;
+    border-bottom: 3px solid #444;
+}
+
+.table-sm th.linkspace {
+    padding-left: 24px;
+}
+
+.linkdot {
+    background: #2384c6;
+    border-radius: 50%;
+    display: inline-block;
+    height: 12px;
+    margin-left: 4px;
+    margin-right: 4px;
+    width: 12px;
+}
+
+.dotlinkbox {
+    margin-left: 20px;
+}
+
+.dotlinkcontent {
+    margin: 0 20;
+    text-indent: -20px;
+}
+
+.table td {
+    word-break: break-all;
+}
+
+.badge-success, .badge-danger, .badge-warning, .badge-info, .badge-light {
+    color: #000;
+}
+
+.text-nowrap {
+    white-space: nowrap;
+}
+
+.container-top {
+    margin-top: 1.6em;
+}
+
+.minheight {
+    min-height: calc(100vh - 128px);
+}
+
+.footer {
+    border-top:1px solid rgba(255,255,255,.2);
+}
+
+.list-group-item {
+    padding: 0.1rem 1rem;
+}
+
+.card-body p {
+    margin-bottom: 0.3rem;
+}
+
+.card-body h5 {
+    margin-top: 1rem;
+}
+
+
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: background-color 5s
+}
+
+.fade-enter,
+.fade-leave-to {
+    background-color: #555;
+}
+
+
+
+.arrow {
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+}
+
+.arrow.asc {
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #fff;
+    opacity: 0.9;
+}
+
+.arrow.dsc {
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #fff;
+    opacity: 0.9;
+}
+
+.arrow.no {
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #fff;
+    opacity: 0.4;
+}
+
+.arrow:hover {
+    opacity: 0.9;
+}
+
+
+.filter-input {
+    height: calc(1.0em + 0.25rem + 2px);
+    background-color: #404040;
+    color: #eee;
+}
+
+
+.debug {
+    color: #555;
+}
+
+
+.hide-symbol {
+    cursor: pointer;
+    color: #fff;
+    opacity: 0.4;
+    margin-left: 1px;
+}
+
+.hide-symbol:hover {
+    opacity: 0.9;
+}
+
+
+.tooled-table-button {
+    margin-left: 2px;
+}
+
+.dropdown-menu {
+    background-color: #333;
+}
+
+.dropdown-menu, .dropdown-divider {
+    border-color: #666;
+}
+
+pre, code {
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    overflow-wrap: break-word;
+}
+
+hr {
+    border-color: #888;
+}
+
+.whiteflash-enter-active {
+  transition: all 2s ease;
+}
+
+.greenflash-enter-active {
+  transition: all 2s ease;
+}
+
+.redflash-enter-active {
+  transition: all 300s ease;
+}
+
+.orangeflash-enter-active {
+  transition: all 300s ease;
+}
+
+.greenflash-enter {
+  transform: translateX(10px);
+  /*opacity: 0;*/
+  color: rgb(0, 220, 180);
+  text-shadow: 0px 0px 8px #0a0;
+}
+
+.redflash-enter {
+  transform: translateX(10px);
+  /*opacity: 0;*/
+  color: rgb(251, 96, 70);
+  text-shadow: 0px 0px 16px #820;
+}
+
+.orangeflash-enter {
+  transform: translateX(10px);
+  /*opacity: 0;*/
+  color: rgb(243, 156, 18);
+  text-shadow: 0px 0px 16px #840;
+}
+
+.whiteflash-enter {
+  transform: translateX(10px);
+  /*opacity: 0;*/
+  color: white;
+  text-shadow: 0px 0px 8px white;
+}
+
+
+.dl-horizontal dt {
+    float: left;
+    width: 160px;
+    clear: left;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dl-horizontal dd {
+    margin-left: 180px;
+    margin-bottom: 0;
+}
+
+.dropdown-sm .dropdown-item {
+    padding: 0.15rem 1.5rem;
+    font-size: 0.82rem;
+}

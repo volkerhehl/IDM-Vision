@@ -1,0 +1,335 @@
+<script type="text/x-template" id="tooled-table-template">
+  <div>
+    <div class="row">
+      <div class="col-6">
+        <small>({{ filteredrows.length }} {{ unfilteredRowsCount > filteredrows.length ? 'filtered' : 'total' }})</small>
+      </div>
+      <div class="col-6 text-right">
+        <span v-if="rightadd" v-html="rightadd"></span>
+        <span v-if="hiddenColumns.length > 0" class="dropdown">
+          <button type="button" class="btn btn-secondary btn-sm dropdown-toggle tooled-table-button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">ADD</button>
+          <div class="dropdown-menu dropdown-menu-right dropdown-sm" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#" v-for="colTitle in hiddenColumns" @click="showColumn(colTitle)">{{ colTitle }}</a>
+          </div>
+        </span>
+        <button v-if="csvexport !== false" type="button" class="btn btn-secondary btn-sm tooled-table-button" @click="download">↓ CSV</button>
+      </div>
+    </div>
+    <table class="table table-hover table-sm">
+      <thead>
+        <tr>
+          <th scope="col" v-for="col in columns" v-if="!hiddenColumns.includes(col.title)">
+            {{ col.title }}
+            <span v-if="col.sort" @click="sortBy(col)" class="arrow" :class="sortKey === col ? (sortOrders[col.title] > 0 ? 'asc' : 'dsc') : 'no'"></span>
+            <span class="hide-symbol" @click="hideColumn(col)">x</span>
+          </th>
+        </tr>
+
+        <tr v-if="hasFilters">
+          <th scope="col" v-for="col in columns" v-if="!hiddenColumns.includes(col.title)">
+            <input v-if="col.filter && rows.length <= 1000" v-model="filters[col.title]" type="text" class="form-control filter-input" placeholder="" value="" size="1">
+            <input v-if="col.filter && rows.length > 1000" v-model.lazy="filters[col.title]" type="text" class="form-control filter-input" placeholder="" value="" size="1">
+          </th>
+        </tr>
+
+        <!--tr class="debug">
+          <th scope="col" v-for="col in columns">
+            {{ String(maxLength[col.title]) + (nowrap[col.title] ? '' : ' cut') }}
+          </th>
+        </tr-->
+      </thead>
+
+      <template v-if="fadekey">
+        <tbody name="fade" is="transition-group">
+          <template v-for="row in filteredrows">
+            <tr v-bind:key="row[fadekey]" v-bind:class="typeof rowclass === 'function' ? rowclass(row) : rowclass">
+              <td v-for="col in columns" v-bind:class="{'text-nowrap': nowrap[col.title] }" v-if="!hiddenColumns.includes(col.title)">
+                <span :class="typeof col.fieldclass === 'function' ? col.fieldclass(row) : col.fieldclass">
+                  <span v-html="row._rendered_[col.title].field"></span>
+                </span>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </template>
+      <template v-else>
+        <tbody>
+          <template v-for="row in filteredrows">
+            <tr v-bind:class="typeof rowclass === 'function' ? rowclass(row) : rowclass">
+              <td v-for="col in columns" v-bind:class="{'text-nowrap': nowrap[col.title] }" v-if="!hiddenColumns.includes(col.title)">
+                <span :class="typeof col.fieldclass === 'function' ? col.fieldclass(row) : col.fieldclass">
+                  <span v-html="row._rendered_[col.title].field"></span>
+                </span>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </template>
+    </table>
+  </div>
+</script>
+
+<script>
+    Vue.component("tooled-table", {
+        template: "#tooled-table-template",
+
+        props: {
+            rows: Array,
+            columns: Array,
+            fadekey: String,
+            rowclass: null,
+            csvexport: null,
+            csvtimestamp: null,
+            polling: Boolean,
+            rightadd: null
+        },
+
+        data: function() {
+            var sortOrders = {}
+            var filters = {}
+            var hasFilters = false
+            var maxLength = {}
+            var nowrap = {}
+            var hiddenColumns = []
+
+            this.columns.forEach(col => {
+                if (this.polling) {
+                    col.filter = false
+                }
+                else if (typeof col.filter === 'number') {
+                    col.filter = this.rows.length > col.filter
+                }
+                else if (col.filter !== false) {
+                    col.filter = this.rows.length > 3
+                }
+                else {
+                    col.filter = false
+                }
+
+                sortOrders[col.title] = 1
+                maxLength[col.title] = 0
+                nowrap[col.title] = true
+
+                if (col.filter) {
+                    filters[col.title] = ''
+                    hasFilters = true
+                }
+
+                if (col.hidden) {
+                    hiddenColumns.push(col.title)
+                }
+
+                if (col.sort === undefined && !this.polling) {
+                    if (col.field && typeof col.field === 'string') {
+                        col.sort = col.field
+                    }
+                    else {
+                        col.sort = true
+                    }
+                }
+            })
+
+            return {
+                sortKey: false,
+                sortOrders: sortOrders,
+                filters: filters,
+                hasFilters: hasFilters,
+                maxLength: maxLength,
+                nowrap: nowrap,
+                unfilteredRowsCount: this.rows.length,
+                hiddenColumns: hiddenColumns
+            }
+        },
+        computed: {
+            filteredrows: function() {
+                var sortKey = this.sortKey
+                var columns = this.columns
+                var filters = this.filters
+                var maxLength = this.maxLength
+                var fields = {}
+                var stripedFields = {}
+
+                // update render cache
+                // @TODO: needed only once on non updating (polling) tables - make a flag for this?
+                for (let row of this.rows) {
+                    if (!row._rendered_) {
+                        var rendered = {}
+
+                        this.columns.forEach(function(col) {
+                            var field
+                            var striped
+                            var len
+
+                            if (typeof col.field === 'function') {
+                                field = col.field(row)
+                                striped = $("<div>").html(field).text().toLowerCase()
+                            }
+                            else {
+                                field = String(row[col.field] === null ? '' : row[col.field])
+                                striped = field.toLowerCase()
+                            }
+
+                            len = striped.length
+                            rendered[col.title] = { field, striped, len }
+                        })
+
+                        row._rendered_ = rendered
+                    }
+                }
+
+                var rows = this.rows
+                var rowsNotCopiedYet = true
+
+                // filter
+                // @TODO: check for hasFilters?!
+                for (var col of columns) {
+                    if (col.filter && filters[col.title]) {
+                        var filterValue = filters[col.title].toLowerCase()
+                        var not = filterValue.charAt(0) === '!'
+
+                        if (not) {
+                            filterValue = filterValue.substr(1)
+                        }
+
+                        if (filterValue.length > 0) {
+                            rowsNotCopiedYet = false
+
+                            rows = rows.filter(function(row) {
+                                if (row._rendered_[col.title].len == 0) {
+                                    return false
+                                }
+
+                                var found = row._rendered_[col.title].striped.includes(filterValue)
+
+                                if (not) {
+                                    return !found
+                                }
+                                else {
+                                    return found
+                                }
+                            })
+                        }
+                    }
+                }
+
+                // sort
+                if (sortKey && rows.length > 0) {
+                    var order = this.sortOrders[sortKey.title] || 1
+
+                    if (rowsNotCopiedYet) {
+                        rows = rows.slice()
+                    }
+
+                    if (sortKey.sort === true) {
+                        rows = rows.sort(function(a, b) {
+                            a = a._rendered_[sortKey.title].striped
+                            b = b._rendered_[sortKey.title].striped
+                            return a.localeCompare(b) * order
+                        })
+                    }
+                    else {
+                        if (typeof rows[0][sortKey.sort] === 'number') {
+                            rows = rows.sort(function(a, b) {
+                                a = a[sortKey.sort] ? a[sortKey.sort] : 0
+                                b = b[sortKey.sort] ? b[sortKey.sort] : 0
+                                return (a > b ? 1 : -1) * order
+                            })
+                        }
+                        else {
+                            rows = rows.sort(function(a, b) {
+                                a = a[sortKey.sort] ? String(a[sortKey.sort]) : ''
+                                b = b[sortKey.sort] ? String(b[sortKey.sort]) : ''
+                                return a.localeCompare(b) * order
+                            })
+                        }
+                    }
+                }
+
+                // column auto wrap ..
+                var sumLength = 0
+
+                for (var col of columns) {
+                    var currentLength = 0
+
+                    for (var row of rows) {
+                        var len = row._rendered_[col.title].len
+
+                        if (currentLength < len) {
+                            currentLength = len
+                        }
+                    }
+
+                    maxLength[col.title] = currentLength + 3
+                    sumLength += currentLength
+                }
+
+                var sorted = columns.map(c => c.title).sort((a, b) => maxLength[b] - maxLength[a])
+                var rest = sumLength
+                var max = 140
+
+                for (let title of sorted) {
+                    this.nowrap[title] = rest < max
+                    rest -= maxLength[title]
+                }
+
+                return rows
+            }
+        },
+        methods: {
+            sortBy: function(key) {
+                this.sortKey = key
+                this.sortOrders[key.title] = this.sortOrders[key.title] * -1
+            },
+
+            download: function() {
+                let filename = typeof this.csvexport === 'string' ? this.csvexport : 'IDM-Vision_Export'
+
+                if (this.csvtimestamp !== false) {
+                    filename += '_' + new Date().toISOString().substring(0, 19).split(':').join('-').replace('T', '_')
+                }
+
+                let colFilter = col => !this.hiddenColumns.includes(col.title)
+                let csvContent = this.columns.filter(colFilter).map(col => col.title).join(';') + '\n'
+
+                csvContent += this.filteredrows.map(row => {
+                    return this.columns.filter(colFilter).map(col => {
+                        let cell
+
+                        if (typeof col.field === 'function') {
+                            cell = $("<div>").html(col.field(row)).text()
+                        }
+                        else {
+                            cell = String(row[col.field] === null ? '' : row[col.field])
+                        }
+
+                        return '"' + cell.split('"').join('""') + '"'
+                    }).join(';')
+                }).join('\n')
+
+                const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+                const data = URL.createObjectURL(blob)
+                const link = document.createElement('a')
+                link.setAttribute('href', data)
+                link.setAttribute('download', filename + '.csv')
+                link.style.visibility = 'hidden'
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+            },
+
+            hideColumn(col) {
+                if (this.hiddenColumns.length < this.columns.length -1) {
+                    this.hiddenColumns.push(col.title)
+                }
+            },
+
+            showColumn(colTitle) {
+                let i = this.hiddenColumns.indexOf(colTitle)
+
+                if (i > -1) {
+                    this.hiddenColumns.splice(i, 1)
+                }
+            }
+        }
+    })
+</script>

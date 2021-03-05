@@ -1,0 +1,73 @@
+<script type="text/x-template" id="poll-table-template">
+    <tooled-table :rows="mutatingrows" :columns="columns" :fadekey="fadekey" :rowclass="rowclass" :csvexport="csvexport" :polling="true" :rightadd="rightadd"></tooled-table>
+</script>
+
+<script>
+    Vue.component("poll-table", {
+        template: '#poll-table-template',
+
+        props: {
+            rows: Array,
+            columns: Array,
+            fadekey: String,
+            rowclass: null,
+            csvexport: null,
+            rightadd: null,
+            pollinterval: Number,
+            pollfromtop: null,
+            pollurl: String
+        },
+
+        data: function() {
+            return {
+                mutatingrows: this.rows
+            }
+        },
+
+        created: function() {
+            if (this.pollinterval && this.pollurl) {
+                this.poll(this.pollurl)
+
+                setInterval(() => {
+                    var url = this.pollurl
+
+                    if (this.pollfromtop && this.mutatingrows.length > 0) {
+                        if (url.includes('?')) {
+                            url += '&from='
+                        }
+                        else {
+                            url += '?from='
+                        }
+
+                        url += this.mutatingrows[0][this.pollfromtop]
+                    }
+
+                    this.poll(url)
+                }, this.pollinterval * 1000)
+            }
+        },
+
+        methods: {
+            update: function(rows) {
+                if (this.pollfromtop) {
+                    if (rows.length > 0) {
+                        this.mutatingrows = rows.concat(this.mutatingrows)
+
+                        if (this.mutatingrows.length > 500) {
+                            this.mutatingrows = this.mutatingrows.slice(0, 500)
+                        }
+                    }
+                }
+                else {
+                    this.mutatingrows = rows
+                }
+            },
+
+            poll: function(url) {
+                fetch(url)
+                .then(result => result.json())
+                .then(rows => this.update(rows))
+            }
+        }
+    })
+</script>

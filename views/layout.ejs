@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/override.css">
+
+    <% if (vars.useragent.browser === 'Firefox' || vars.useragent.browser === 'Edge') { %>
+      <link rel="stylesheet" href="/css/fireedgefix.css">
+    <% } %>
+
+    <% if (typeof vars !== 'undefined') { %>
+      <title><%= vars.appName %><%= vars.titleAdd ? ' - ' + vars.titleAdd : '' %></title>
+    <% } %>
+  </head>
+
+  <body>
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <script src="/js/popper-1.16.0.min.js"></script>
+    <script src="/js/bootstrap-4.4.1.min.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/vue.js"></script>
+    <script src="/js/basic-helper.js"></script>
+    <script src="/js/idm-helper.js"></script>
+
+    <script>
+        var helper = basichelper.generate();
+
+        <% if (vars.idmId) { %>
+            var helper = idmhelper.generate({ idmId: '<%- vars.idmId %>', addHelper: helper });
+        <% } %>
+    </script>
+
+    <%- include('vue/tooled-table') %>
+    <%- include('vue/poll-table') %>
+    <%- include('vue/diff-table') %>
+
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-primary">
+      <% if (typeof vars !== 'undefined') { %>
+        <a class="navbar-brand" href="/"><%= vars.appName %></a>
+        <% if (vars.menus) { %>
+          <%- include('menu/navbar', { menu: vars.menus.main, location: 'left' }) %>
+          <%- include('menu/navbar', { menu: vars.menus.admin, location: 'right' }) %>
+        <% } %>
+      <% } %>
+    </nav>
+
+    <div class="container-fluid container-top">
+      <div class="minheight">
+        <% if (typeof vars !== 'undefined' && vars.error) { %>
+          <div class="row">
+            <div class="col">
+              <div class="alert alert-dismissible alert-danger">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <h5><%= vars.errorAdd ? vars.errorAdd + ' - ' : '' %><%= vars.error.message || vars.error %></h5>
+                <%= vars.error.code %>
+                <pre><%= vars.error.stack %></pre>
+              </div>
+            </div>
+          </div>
+        <% } %>
+
+        <%-body%>
+
+        <% if (typeof debugFlag !== 'undefined' && debugFlag) { %>
+          <hr/>
+          <h5>Debug:</h5>
+          <pre>user: <%= CJSON.stringify(user, null, 4) %></pre>
+          <pre>vars: <%= CJSON.stringify(vars, null, 4) %></pre>
+          <pre>defs: <%= CJSON.stringify(defs, null, 4) %></pre>
+        <% } %>
+      </div>
+
+      <footer class="row mt-4 footer">
+        <div class="col">
+          <p><small class="text-white-50"><%= vars.appName %> - &copy; 2020 Volker Hehl - MIT License</small></p>
+        </div>
+        <div class="col text-right">
+          <% if (typeof user !== 'undefined' && user.name !== 'anonymous') { %>
+            <p><small class="text-white-50"><strong><%= user.name %></strong><%= user.longname ? ' - ' + user.longname : '' %><%= user.roles ? ' (' + user.roles.join(', ') + ')' : '' %></small></p>
+          <% } %>
+        </div>
+      </footer>
+
+    </div>
+  </body>
+</html>

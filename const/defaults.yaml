@@ -1,0 +1,36 @@
+privileges:
+  basic-group:
+    description: Basic functions
+    privs:
+      search-entry: Search Entry
+  admin-group:
+    description: Admin functions
+    privs:
+      admin-pageviews: Show page views
+      admin-users: Show users, roles ans privileges
+      admin-privs: Show privileges and groups
+      admin-probes: Show probes status
+      admin-logs: Show logs
+  int-entry-plugin-group:
+    description: Internal entry plugins
+  int-generic-plugin-group:
+    description: Internal generic plugins
+  custom-entry-plugin-group:
+    description: Custom entry plugins
+  custom-generic-plugin-group:
+    description: Custom generic plugins
+
+roles:
+  admin:
+    description: Administrator
+    privs: '*'
+
+  superuser:
+    description: Super privileged user
+    groups:
+      - basic-group
+      - int-entry-plugin-group
+      - int-generic-plugin-group
+      - custom-entry-plugin-group
+      - custom-generic-plugin-group
+      - admin-group

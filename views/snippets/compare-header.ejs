@@ -1,0 +1,22 @@
+<div class="row">
+  <div class="col text-right">
+    <span><%= left.idm.name %> - <%= left.idm.description %></span><br/>
+    <span class="text-success"><%= left.mskey %></span><br/>
+    <span><%= left.entrytype %></span><br/>
+    <span class="text-info"><%= left.mskeyvalue %></span><br/>
+    <span><%= left.displayname %></span>
+  </div>
+  <div class="col-2 text-center">
+    <h1>< | ></h1>
+    <% if (typeof title !== 'undefined') { %>
+      <h4><%= title %></h4>
+    <% } %>
+  </div>
+  <div class="col text-left">
+    <span><%= right.idm.name %> - <%= right.idm.description %></span><br/>
+    <span class="text-success"><%= right.mskey %></span><br/>
+    <span><%= right.entrytype %></span><br/>
+    <span class="text-info"><%= right.mskeyvalue %></span><br/>
+    <span><%= right.displayname %></span>
+  </div>
+</div>

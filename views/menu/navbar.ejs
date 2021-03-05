@@ -1,0 +1,19 @@
+<% if (menu) { %>
+  <% let loc = typeof location === 'undefined' ? 'left' : location %>
+  <% let pos = loc === 'left' ? 'r' : 'l' %>
+  <% pos = loc === 'middle' ? 'x' : pos %>
+  <div class="collapse navbar-collapse" id="<%= menu.id %>">
+    <ul class="navbar-nav m<%= pos %>-auto">
+      <% const content = loc === 'right' ? menu.content.slice().reverse() : menu.content %>
+      <% for (let el of content) { %>
+        <% if (el.type == 'item') { %>
+          <li class="nav-item">
+            <a class="nav-link<%= el.active ? '' : ' disabled' %><%= el.name.includes('!') ? ' text-danger' : ''%>" href="<%= el.link %>"><%- el.name.includes('!') ? '<strong>' : '' %><%= el.name %><%- el.name.includes('!') ? '</strong>' : '' %></a>
+          </li>
+        <% } else if (el.type == 'menu') { %>
+          <%- include('dropdown', { name: el.name, menu: el.menu }) %>
+        <% } %>
+      <% } %>
+    </ul>
+  </div>
+<% } %>

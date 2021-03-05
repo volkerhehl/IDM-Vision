@@ -1,0 +1,79 @@
+<div class="row">
+  <div class="col" id="vue-app">
+      <tooled-table :rows="rows" :columns="columns"></tooled-table>
+  </div>
+</div>
+
+<script>
+    var oldvalues = <%- JSON.stringify(plugin.oldvalues) %>
+</script>
+
+<script>
+    function makeValueLink(row) {
+        if (row.ValueMSKV) {
+            return helper.makeMskeyLink(row.aValue, row.ValueMSKV)
+        }
+
+        return row.aValue
+    }
+
+    function makeChangedByLink(row) {
+        if (row.ChangedByMSKV) {
+            return helper.makeMskeyLink(row.ChangedBy, row.ChangedByMSKV)
+        }
+
+        return row.ChangedBy
+    }
+
+    function makeAuditTaskLink(row) {
+        const text = row.AuditTaskName + ' (' + row.AuditTaskId + ')'
+        return helper.makeJobTaskIdLink(row.AuditTaskId, text)
+    }
+
+    var vapp = new Vue({
+        el: '#vue-app',
+        data: {
+            rows: oldvalues,
+            columns: [
+                {
+                    title: 'Attribute',
+                    field: 'AttrName'
+                },
+                {
+                    title: 'Value',
+                    field: row => makeValueLink(row)
+                },
+                {
+                    title: 'Value Displayname',
+                    field: 'ValueDisplayName',
+                    hidden: true
+                },
+                {
+                    title: 'Operation',
+                    field: 'Changename'
+                },
+                {
+                    title: 'Audit ID',
+                    field: 'AuditId'
+                },
+                {
+                    title: 'Audit Task',
+                    field: row => makeAuditTaskLink(row)
+                },
+                {
+                    title: 'Modified',
+                    field: row => helper.dateFormat(row.Modifytime),
+                    sort: 'Modifytime'
+                },
+                {
+                    title: 'Modified by',
+                    field: row => makeChangedByLink(row)
+                },
+                {
+                    title: 'User ID',
+                    field: row => helper.makeProcessInfoLink(row.UserID)
+                }
+            ]
+        }
+    })
+</script>

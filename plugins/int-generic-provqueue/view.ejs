@@ -1,0 +1,177 @@
+<% if (plugin.pqueue) { %>
+    <div class="row">
+      <div class="col" id="vue-app">
+        <h4>Provisioning Queue</h4>
+        <tooled-table :rows="rows" :columns="columns"></tooled-table>
+      </div>
+    </div>
+
+    <script>
+        var pqueue = <%- JSON.stringify(plugin.pqueue) %>
+    </script>
+
+    <script>
+        var vapp = new Vue({
+            el: '#vue-app',
+
+            data: {
+                // rowclass: row => row.DispatcherActive == 0 ? 'text-danger' : null,
+                rows: pqueue,
+                columns: [
+                    {
+                        title: 'Task',
+                        field: row => helper.makeJobTaskIdLink(row.TaskID, row.TaskID + ' - ' + row.TaskName)
+                    },
+                    // {
+                    //     title: 'Private',
+                    //     field: 'Private'
+                    // },
+                    {
+                        title: 'Queue size',
+                        field: row => helper.makeLink('<%- thisURL %>?taskId=' + row.TaskID, row.QueSize)
+                    },
+                    {
+                        title: 'Max retries',
+                        field: 'maxRetries'
+                    },
+                    {
+                        title: 'Average retries',
+                        field: 'avgRetries'
+                    },
+                    {
+                        title: 'Parent task',
+                        field: row => helper.makeJobTaskIdLink(row.mcmv_parentid, row.mcmv_parentid)
+                    },
+                    {
+                        title: 'Last executed',
+                        field: row => helper.dateFormat(row.last_executed)
+                    },
+                    // {
+                    //     title: 'mcmv_jobactive',
+                    //     field: 'mcmv_jobactive'
+                    // },
+                    {
+                        title: 'Scheduled',
+                        field: row => helper.dateFormat(row.mcmv_jobscheduled)
+                    },
+                    {
+                        title: 'Job state',
+                        field: row => {
+                            let text = ''
+                            let label
+
+                            switch (row.mcmv_jobstate) {
+                                case -1:
+                                    label = 'danger'
+                                    text = 'error'
+                                    break;
+
+                                case 0:
+                                    label = 'warning'
+                                    text = 'disabled'
+                                    break;
+
+                                case 1:
+                                    label = 'light'
+                                    text = 'idle'
+                                    break;
+
+                                case 2:
+                                    label = 'success'
+                                    text = 'running'
+                                    break;
+
+                                case 3:
+                                    label = 'info'
+                                    text = 'stopping'
+                                    break;
+                            }
+
+                            if (label) {
+                                return helper.badge(label, text)
+                            }
+                            else {
+                                return text
+                            }
+                        }
+                    },
+                    {
+                        title: 'Job',
+                        field: row => helper.makeJobTaskIdLink(row.mcmv_jobid, row.mcmv_jobid)
+                    },
+                    {
+                        title: 'Dispatcher',
+                        field: row => {
+                            const label = row.DispatcheStatus == 'active' ? 'light' : (row.DispatcheStatus == 'off' ? 'warning' : null)
+                            const text = label ? helper.badge(label, row.DispatcheStatus) : row.DispatcheStatus
+                            return text
+                        }
+                    }
+                ]
+            }
+        })
+    </script>
+<% } %>
+
+
+<% if (plugin.entries) { %>
+    <div class="row">
+      <div class="col" id="vue-app">
+        <h4>Provisioning Queue Entries (<span class="text-info"><%= plugin.entries[0].TaskName %></span>)</h4>
+        <%- helper.makeJobTaskIdLink(plugin.entries[0].TaskID, 'Task: ' + plugin.entries[0].TaskID + ' - ' + plugin.entries[0].TaskName) %>
+        <tooled-table :rows="rows" :columns="columns"></tooled-table>
+      </div>
+    </div>
+
+    <script>
+        var entries = <%- JSON.stringify(plugin.entries) %>
+    </script>
+
+    <script>
+        var vapp = new Vue({
+            el: '#vue-app',
+
+            data: {
+                rows: entries,
+                columns: [
+                    {
+                        title: 'MSKEYVALUE',
+                        field: row => helper.makeMskeyLink(row.MSKey, row.MSKEYVALUE || '?')
+                    },
+                    {
+                        title: 'Display Name',
+                        field: 'DisplayName'
+                    },
+                    {
+                        title: 'State',
+                        field: 'StateName'
+                    },
+                    {
+                        title: 'Previous State',
+                        field: 'PrevStateName'
+                    },
+                    {
+                        title: 'Repository',
+                        field: 'rep_name'
+                    },
+                    {
+                        title: 'Retries',
+                        field: 'RetryCount'
+                    },
+                    {
+                        title: 'Message',
+                        field: 'MSG'
+                    },
+                    {
+                        title: 'Executed',
+                        field: row => helper.dateFormat(row.ExecTime)
+                    },
+                    {
+                        title: 'Audit ref',
+                        field: 'AuditRef'
+                    }
+                ]
+            }
+        })
+    </script>
+<% } %>

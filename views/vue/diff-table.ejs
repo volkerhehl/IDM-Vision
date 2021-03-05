@@ -1,0 +1,90 @@
+<script type="text/x-template" id="diff-table-template">
+    <tooled-table :rows="combinedrows" :columns="combinedcolumns" :rowclass="rowclass" :csvexport="csvexport" :polling="false" :rightadd="rightadd"></tooled-table>
+</script>
+
+<script>
+    Vue.component("diff-table", {
+        template: '#diff-table-template',
+
+        props: {
+            rows: Array,
+            columns: Array,
+            csvexport: null,
+            rightadd: null
+        },
+
+        data: function() {
+            var filled = this.rows[0].left ? this.rows[0].left : this.rows[0].right
+            var fields = Object.keys(filled)
+
+            var combinedrows = this.rows.map(r => {
+                var row = {}
+
+                for (var field of fields) {
+                    row['< ' + field] = r.left ? r.left[field] : null
+                    row['> ' + field] = r.right ? r.right[field] : null
+                }
+
+                row['cmp'] = r.left && r.right ? '=' : '#'
+                return row
+            })
+
+            var combinedcolumns = []
+
+            function modRow(row, add) {
+                let mrow = {}
+
+                for (var field of fields) {
+                    mrow[field] = row[add + field]
+                }
+
+                return mrow
+            }
+
+            function modField(field, add) {
+                if (typeof field === 'function') {
+                    return (row) => field(modRow(row, add))
+                }
+
+                return add + field
+            }
+
+            for (var column of this.columns) {
+                combinedcolumns.push({
+                    title: '< ' + column.title,
+                    field: modField(column.field, '< '),
+                    sort: column.sort,
+                    hidden: column.hidden
+                })
+            }
+
+            combinedcolumns.push({
+                title: '< | >',
+                field: 'cmp'
+            })
+
+            for (var column of this.columns) {
+                combinedcolumns.push({
+                    title: '> ' + column.title,
+                    field: modField(column.field, '> '),
+                    sort: column.sort,
+                    hidden: column.hidden
+                })
+            }
+
+            console.log(JSON.stringify(combinedcolumns, null, 4))
+
+            return {
+                combinedrows: combinedrows,
+                combinedcolumns: combinedcolumns,
+
+                rowclass: row => {
+                    const left = Object.keys(row).filter(k => k.charAt(0) === '<' && row[k] === null)
+                    const right = Object.keys(row).filter(k => k.charAt(0) === '>' && row[k] === null)
+                    const equal = left.length === 0 && right.length === 0
+                    return equal ? '' : 'text-danger'
+                }
+            }
+        }
+    })
+</script>

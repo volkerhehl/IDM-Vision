@@ -1,0 +1,52 @@
+<h4>Users</h4>
+
+<div class="row">
+  <div class="col" id="vue-app">
+    <tooled-table :rows="rows" :columns="columns"></tooled-table>
+  </div>
+</div>
+
+<script>
+    var idmID = <%- JSON.stringify(idmID) %>
+    var users = <%- JSON.stringify(users) %>
+</script>
+
+<script>
+    function userLink(user) {
+        if (!idmID) {
+            return name
+        }
+
+        return helper.makeLink('/idm/' + idmID + '/mskey/' + user.mskey, user.name)
+    }
+
+    var vapp = new Vue({
+        el: '#vue-app',
+        data: {
+            rows: users,
+            columns: [
+                {
+                    title: 'Name',
+                    field: 'longname'
+                },
+                {
+                    title: 'Username',
+                    field: user => userLink(user)
+                },
+                {
+                    title: 'Roles',
+                    field: user => user.roles.join(', ')
+                },
+                {
+                    title: 'Privileges',
+                    field: user => user.privileges.join(',<br/>'),
+                    hidden: true
+                },
+                {
+                    title: 'Info',
+                    field: 'info'
+                }
+            ]
+        }
+    })
+</script>

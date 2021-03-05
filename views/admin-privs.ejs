@@ -1,0 +1,70 @@
+<h4>Privileges</h4>
+<div class="row">
+  <div class="col" id="privileges-table">
+    <tooled-table :rows="rows" :columns="columns"></tooled-table>
+  </div>
+</div>
+
+<h4>Roles</h4>
+<div class="row">
+  <div class="col" id="roles-table">
+    <tooled-table :rows="rows" :columns="columns"></tooled-table>
+  </div>
+</div>
+
+<script>
+    var privs = <%- JSON.stringify(privs) %>;
+    var roles = <%- JSON.stringify(roles) %>
+</script>
+
+<script>
+    var vapp = new Vue({
+        el: '#privileges-table',
+        data: {
+            rows: privs,
+            columns: [
+                {
+                    title: 'Group',
+                    field: 'groupName'
+                },
+                {
+                    title: 'Group ID',
+                    field: 'groupId'
+                },
+                {
+                    title: 'Privilege',
+                    field: 'privName'
+                },
+                {
+                    title: 'Privilege ID',
+                    field: 'privId'
+                }
+            ]
+        }
+    })
+
+    var vapp = new Vue({
+        el: '#roles-table',
+        data: {
+            rows: roles,
+            columns: [
+                {
+                    title: 'Role',
+                    field: 'roleName'
+                },
+                {
+                    title: 'Role ID',
+                    field: 'roleId'
+                },
+                {
+                    title: 'Group ID',
+                    field: 'groupId'
+                },
+                {
+                    title: 'Privilege ID',
+                    field: 'privId'
+                }
+            ]
+        }
+    })
+</script>

@@ -1,0 +1,31 @@
+{
+  "name": "IDM-Vision",
+  "version": "0.9.5",
+  "description": "SAP IDM Content Monitoring",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/volkerhehl/IDM-Vision.git"
+  },
+  "author": "Volker Hehl",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "circular-json": "^0.5.9",
+    "dateformat": "^3.0.3",
+    "ejs": "^3.0.1",
+    "express": "^4.17.1",
+    "express-ejs-layouts": "^2.5.0",
+    "express-useragent": "^1.0.13",
+    "influx": "^5.5.2",
+    "js-yaml": "^3.13.1",
+    "mssql": "^6.0.1",
+    "node-sspi": "^0.2.7",
+    "socket.io": "^2.3.0",
+    "vue": "^2.6.11",
+    "winston": "^3.2.1"
+  }
+}

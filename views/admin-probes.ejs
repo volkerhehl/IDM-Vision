@@ -1,0 +1,136 @@
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    var idms = <%- JSON.stringify(idms) %>;
+    const waitingBagde = helper.badge('info', 'waiting')
+</script>
+
+<h4>Monitoring</h4>
+<h5>Probes</h4>
+
+<div class="row">
+  <div class="col" id="probe-table">
+    <table class="table table-hover table-sm">
+      <thead>
+        <tr>
+          <th scope="col">Probe</th>
+          <th scope="col">Interval</th>
+          <th scope="col">Status&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+          <th scope="col">Cycles</th>
+          <th scope="col">Timeouts</th>
+          <th scope="col">Errors</th>
+          <th v-for="idm in idms">{{ idm.name }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="probe in probes">
+          <td class="text">{{ probe.name }}</td>
+          <td class="text">{{ probe.intervalMS }} ms</td>
+          <td class="text"><span v-html="statusBadge(probe)"></span></td>
+          <td class="text">
+            <transition name="whiteflash" mode="out-in">
+              <span :key="probe.cycles">{{ probe.cycles }}</span>
+            </transition>
+          </td>
+          <td class="text">
+            <transition name="orangeflash" mode="out-in">
+              <span :key="probe.skips">{{ probe.skips }}</span>
+            </transition>
+          </td>
+          <td class="text">
+            <transition name="redflash" mode="out-in">
+              <span :key="probe.errors">{{ probe.errors }}</span>
+            </transition>
+          </td>
+          <td v-for="idm in idms">
+            <span v-if="probe.idmStats[idm.id]">
+              <transition name="whiteflash" mode="out-in">
+                <span :key="probe.idmStats[idm.id].cycles">
+                  {{ probe.idmStats[idm.id].cycles }}
+                </span>
+              </transition>
+              :
+              <transition name="redflash" mode="out-in">
+                <span :key="probe.idmStats[idm.id].errors">
+                  {{ probe.idmStats[idm.id].errors }}
+                </span>
+              </transition>
+            </span>
+            <span v-if="!probe.idmStats[idm.id]">-</span>
+          </th>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <h5>Endpoints</h5>
+    <small>
+      <strong>InfluxDB</strong><span class="text-muted"> - </span>
+      <span class="text-muted">Server:</span> <strong><%= database.host %></strong><span class="text-muted"> - </span>
+      <span class="text-muted">Database:</span> <strong><%= database.dbname %></strong>
+    </small>
+
+    <table class="table table-hover table-sm">
+      <thead>
+        <tr>
+          <th scope="col">Probe</th>
+          <th scope="col">Measurement</th>
+          <th scope="col">Fields</th>
+          <th scope="col">Tags</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (let ep of endpoints) { %>
+          <tr>
+            <td class="text"><%= ep.probe %></td>
+            <td class="text"><%= ep.measurement %></td>
+            <td class="text"><%= ep.fields.join(', ') %></td>
+            <td class="text"><%= ep.tags.join(', ') %></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+    var socket = io()
+
+    var app = new Vue({
+        el: "#probe-table",
+
+        data: {
+            probes: [],
+            idms: idms
+        },
+
+        methods: {
+            statusBadge: (probe) => {
+                if (probe.running) {
+                    return helper.badge('success', 'running')
+                }
+
+                if (probe.error) {
+                    return helper.badge('danger', 'error')
+                }
+
+                if (probe.skipped) {
+                    return helper.badge('warning', 'timeout')
+                }
+
+                return helper.badge('light', 'idle')
+            }
+        }
+    })
+
+    socket.on('probes', function(data) {
+        app.probes = data
+    })
+
+    $(document).ready(function() {
+        socket.emit('trigger', 'probes-update')
+    })
+</script>

@@ -1,0 +1,63 @@
+<div class="row">
+  <div class="col" id="vue-app">
+      <tooled-table :rows="rows" :columns="columns"></tooled-table>
+  </div>
+</div>
+
+<script>
+    var auditlog = <%- JSON.stringify(plugin.auditlog) %>
+</script>
+
+<script>
+    function makeTaskLink(row) {
+        const text = row.TaskName + ' (' + row.TaskId + ')'
+        return helper.makeJobTaskIdLink(row.TaskId, text)
+    }
+
+    var vapp = new Vue({
+        el: '#vue-app',
+        data: {
+            rows: auditlog,
+            columns: [
+                {
+                    title: 'Audit ID',
+                    field: 'AuditID',
+                    sort: 'AuditID'
+                },
+                {
+                    title: 'Ref Audit',
+                    field: 'RefAudit'
+                },
+                {
+                    title: 'Repository',
+                    field: 'rep_name'
+                },
+                {
+                    title: 'Task',
+                    field: row => makeTaskLink(row)
+                },
+                {
+                    title: 'Prov Status',
+                    field: row => helper.provStatusBadge(row.ProvStatus, row.ProvStatusName)
+                },
+                {
+                    title: 'Message',
+                    field: 'MSG'
+                },
+                {
+                    title: 'Initiated',
+                    field: row => helper.dateFormat(row.PostedDate),
+                    sort: 'PostedDate'
+                },
+                {
+                    title: 'By',
+                    field: 'Postedby'
+                },
+                {
+                    title: 'User ID',
+                    field: row => helper.makeProcessInfoLink(row.userid)
+                }
+            ]
+        }
+    })
+</script>
