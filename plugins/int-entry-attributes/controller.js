@@ -17,7 +17,7 @@ module.exports = {
     // all flat attributes just available in entry.attributes
     call: async function({ entry, query, config, logger, params, compareEntry, helper, compare }) {
         function trim(attributes) {
-            if (config.trimLongAttributes) {
+            if (config && config.trimLongAttributes) {
                 return attributes.map(function(row) {
                     if (config.trimLongAttributes.includes(row.AttrName)) {
                         row.aValue = row.aValue.substr(0, 40) + ' ...'
@@ -26,6 +26,8 @@ module.exports = {
                     return row
                 })
             }
+
+            return attributes
         }
 
         const attributes = trim(entry.attributes)
