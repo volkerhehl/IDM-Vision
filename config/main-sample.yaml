@@ -1,38 +1,38 @@
-customPluginPath: ../my-plugins
+# customPluginPath: ../my-plugins
 port: 7000
 
-# auth:
-#   method: anonymous
-
 auth:
-  method: sspi
-  domain: myadsdomain
-  source: idp
-  userAttr: SAMACCOUNTNAME_ATTR
-  userNameAttr: DISPLAYNAME
+  method: anonymous
 
-  entries:
-    superuser:
-      - PRIV:IDM:SUPERUSER
-    admin:
-      - PRIV:IDM:ADMIN
+# auth:
+#   method: sspi
+#   domain: myadsdomain
+#   source: idp
+#   userAttr: SAMACCOUNTNAME_ATTR
+#   userNameAttr: DISPLAYNAME
 
-  manual:
-    myrole:
-      - myadsdomain\user1
-      - myadsdomain\user2
+#   entries:
+#     superuser:
+#       - PRIV:IDM:SUPERUSER
+#     admin:
+#       - PRIV:IDM:ADMIN
 
-roles:
-  myrole:
-    description: My own role
-    privs:
-      - search-entry
-    groups:
-      - int-generic-plugin-group
+#   manual:
+#     myrole:
+#       - myadsdomain\user1
+#       - myadsdomain\user2
 
-additionalTopSearchAttributes:
-  - DESCRIPTION
-  - PR_NAME_IN_TARGETSYSTEM
+# roles:
+#   myrole:
+#     description: My own role
+#     privs:
+#       - search-entry
+#     groups:
+#       - int-generic-plugin-group
+
+# additionalTopSearchAttributes:
+#   - DESCRIPTION
+#   - PR_NAME_IN_TARGETSYSTEM
 
 # activate probes here
 # probes:
@@ -46,7 +46,7 @@ additionalTopSearchAttributes:
 #   resetDowntimeMinutes: 180
 
 # plugin specific configurations
-plugins:
-  int-entry-attributes:
-    trimLongAttributes:
-      - MX_USER_PREFS
+# plugins:
+#   int-entry-attributes:
+#     trimLongAttributes:
+#       - MX_USER_PREFS
