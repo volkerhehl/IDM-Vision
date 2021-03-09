@@ -36,17 +36,32 @@
             rows: oldvalues,
             columns: [
                 {
-                    title: 'Attribute',
-                    field: 'AttrName'
+                    title: 'Entry',
+                    field: row => makeValueLink(row),
+                    hidden: true
                 },
                 {
-                    title: 'Value',
-                    field: row => makeValueLink(row)
-                },
-                {
-                    title: 'Value Displayname',
+                    title: 'Entry Displayname',
                     field: 'ValueDisplayName',
                     hidden: true
+                },
+                {
+                    title: 'Entry Type',
+                    field: 'fromEntryType',
+                    hidden: true
+                },
+                {
+                    title: 'Source Entry',
+                    field: row => helper.makeMskeyLink(row.fromMSKEY, row.fromMSKV)
+                },
+                {
+                    title: 'Source Displayname',
+                    field: 'fromDN',
+                    hidden: true
+                },
+                {
+                    title: 'Attribute',
+                    field: 'AttrName'
                 },
                 {
                     title: 'Operation',

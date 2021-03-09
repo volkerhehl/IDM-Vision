@@ -64,4 +64,4 @@ cd ..
 node app
 ```
 
-Open localy: [http://127.0.0.1:7000](http://127.0.0.1:7000)
+Open locally: [http://127.0.0.1:7000](http://127.0.0.1:7000)
