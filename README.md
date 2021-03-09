@@ -27,7 +27,7 @@ Running IDM Vision locally, **accessible without any authentication!**
 Ensure you have Node.js and build tools installed.
 
 ```bash
-clone https://github.com/volkerhehl/IDM-Vision.git
+git clone https://github.com/volkerhehl/IDM-Vision.git
 cd IDM-Vision
 npm install
 ```
