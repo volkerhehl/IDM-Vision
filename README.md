@@ -10,9 +10,9 @@ Licence: MIT
 ## Requirements
 
 * Windows (other OS may work too)
-* Git
-* Node.js V10.15.x or higher
-* Node.js build tools
+* Git: [https://git-scm.com/downloads](https://git-scm.com/downloads)
+* Node.js V12: [https://nodejs.org/en/download/releases/](https://nodejs.org/en/download/releases/) (other versions may work too - V14 currently don't work with the ***node-sspi*** module, if you need V14 but no AD user authentication, delete ```node-sspi``` from ```package.json``` before ```npm install```)
+* Node.js build tool chain: check "Tools for Native Modules" during Node.js setup
 * SAP IDM V7.2 or V8 (other versions may work too)
 * Currently only MSSQL server supported!
 
@@ -23,8 +23,6 @@ Running IDM Vision locally, **accessible without any authentication!**
 
 
 ### Install
-
-Ensure you have Node.js and build tools installed.
 
 ```bash
 git clone https://github.com/volkerhehl/IDM-Vision.git
@@ -65,3 +63,23 @@ node app
 ```
 
 Open locally: [http://127.0.0.1:7000](http://127.0.0.1:7000)
+
+## Run as Windows service
+
+### Install service using NSSM
+
+Download NSSM: [https://nssm.cc/download](https://nssm.cc/download)
+
+Create a new service from console
+
+```
+nssm install IDM-Vision
+```
+
+Fill GUI Fields
+
+* ***Path***: path to Node.js binary, for example: ```C:\Program Files\nodejs\node.exe```
+* ***Startup directory***: path to IDM-Vision, for example: ```C:\IDM-Vision```
+* ***Arguments***: ```app```
+
+Click ***Install service*** button
