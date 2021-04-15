@@ -1,9 +1,7 @@
 # IDM Vision
 
 SAP IDM content browser and system monitoring
-
 (c) 2020 Volker Hehl
-
 Licence: MIT
 
 
@@ -83,3 +81,72 @@ Fill GUI Fields
 * ***Arguments***: ```app```
 
 Click ***Install service*** button
+
+## Enable Authentication
+
+IDM-Vision authentication works in three steps:
+
+1. Authentication
+   Currently only SSPI (Windows ADS) authentication available
+
+2. IDM User matching
+   Find MX_PERSON via AD sam account name attribute matching
+
+3. IDM Privilege matching
+   Find entry relations (eg. privileges) on MX_PERSON and map it to IDM-Vision roles
+
+### IDM-Vision Default Roles
+
+* admin - full access including admin menu
+* superuser - full acces without admin menu
+
+### Configure
+
+Edit ```config/main.yaml```
+
+Remove
+
+```yaml
+auth:
+  method: anonymous
+```
+
+Add
+
+```yaml
+auth:
+  method: sspi (currently only SSPI authentication available)
+  domain: <active directory domain name>
+  source: <IDM, which contains AD-users ... must be configured in idms.yaml>
+  userAttr: <MX_PERSON attribute, which matches AD sam account name>
+  userNameAttr: <MX_PERSON attribute which contains user clear name>
+
+  entries: (enable IDM entry relation matching)
+    admin: (IDM-Vision admin role)
+      - <MX_PERSON relation entry to activate admin privileges>
+    superuser: (IDM-Vision superuser role)
+      - <MX_PERSON relation entry to activate superuser privileges>
+```
+
+### Example
+
+```yaml
+auth:
+  method: sspi
+  domain: mydomain
+  source: idp
+  userAttr: P_ADSLOGON
+  userNameAttr: DISPLAYNAME
+
+  entries:
+    admin:
+      - PRIV:IDMVISION_ADMIN
+    superuser:
+      - PRIV:IDMVISION_SUPERUSER
+```
+
+### List all privileged users
+
+To list all Users matching IDM-Vision roles, you need admin privileges.
+
+* http://localhost:7000/admin/users

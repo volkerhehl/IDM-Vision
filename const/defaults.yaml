@@ -33,4 +33,3 @@ roles:
       - int-generic-plugin-group
       - custom-entry-plugin-group
       - custom-generic-plugin-group
-      - admin-group
