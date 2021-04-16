@@ -1,7 +1,7 @@
 # IDM Vision
 
-SAP IDM content browser and system monitoring
-(c) 2020 Volker Hehl
+SAP IDM content browser and system monitoring  
+(c) 2020 Volker Hehl  
 Licence: MIT
 
 
@@ -86,13 +86,13 @@ Click ***Install service*** button
 
 IDM-Vision authentication works in three steps:
 
-1. Authentication
+1. Authentication  
    Currently only SSPI (Windows ADS) authentication available
 
-2. IDM User matching
+2. IDM User matching  
    Find MX_PERSON via AD sam account name attribute matching
 
-3. IDM Privilege matching
+3. IDM Privilege matching  
    Find entry relations (eg. privileges) on MX_PERSON and map it to IDM-Vision roles
 
 ### IDM-Vision Default Roles
