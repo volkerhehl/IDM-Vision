@@ -1,0 +1,186 @@
+<% if (plugin.jobs) { %>
+    <div class="row">
+      <div class="col" id="vue-app">
+        <% if (query.all) { %>
+            <h4>All jobs</h4>
+        <% } else { %>
+            <h4>Running and failed jobs</h4>
+            <a class="btn btn-primary" href="?all=true" role="button">List all jobs!</a>
+        <% } %>
+        <tooled-table :rows="rows" :columns="columns"></tooled-table>
+      </div>
+    </div>
+
+    <script>
+        var jobs = <%- JSON.stringify(plugin.jobs) %>
+    </script>
+
+    <script>
+        var vapp = new Vue({
+            el: '#vue-app',
+
+            data: {
+                // rowclass: row => row.DispatcherActive == 0 ? 'text-danger' : null,
+                rows: jobs,
+                columns: [
+                    {
+                        title: 'Group Name',
+                        field: 'GroupName'
+                    },
+                    {
+                        title: 'Job Id',
+                        field: 'JobId'
+                    },
+                    {
+                        title: 'Job Name',
+                        field: row => helper.makeJobTaskIdLink(row.JobId, row.JobName)
+                    },
+                    {
+                        title: 'State',
+                        field: row => {
+                            let text = ''
+                            let label
+
+                            switch (row.State) {
+                                case 0:
+                                    label = 'info'
+                                    text = 'disabled'
+                                    break;
+
+                                case -2:
+                                    label = 'warning'
+                                    text = 'timeout'
+                                    break;
+
+                                case 1:
+                                    label = 'light'
+                                    text = 'idle'
+                                    break;
+
+                                case 2:
+                                    label = 'success'
+                                    text = 'running'
+                                    break;
+
+                                case 3:
+                                    label = 'warning'
+                                    text = 'stopping'
+                                    break;
+
+                                default:
+                                    label = 'danger'
+                                    text = '???'
+                            }
+
+                            if (label) {
+                                return helper.badge(label, text + ': ' + row.State)
+                            }
+                            else {
+                                return text
+                            }
+                        }
+                    },
+                    {
+                        title: 'Active',
+                        field: row => helper.badge(row.Active == '1' ? 'success' : 'light', row.Active)
+                    },
+                    {
+                        title: 'Status',
+                        field: row => {
+                            let label
+
+                            if (row.Status) {
+                                switch (row.Status) {
+                                    case 0:
+                                        label = 'success'
+                                        break;
+
+                                    case -1:
+                                        label = 'light'
+                                        break;
+
+                                    case -99:
+                                        label = 'warning'
+                                        break;
+
+                                    default:
+                                        label = 'danger'
+                                }
+                            }
+
+                            if (label) {
+                                return helper.badge(label, row.StatusText + ': ' + row.Status)
+                            }
+                            else {
+                                return null
+                            }
+                        }
+                    },
+                    {
+                        title: 'Dispatcher',
+                        field: 'dispatcher'
+                    },
+                    {
+                        title: 'Schedule Rule',
+                        field: 'SchedRule'
+                    },
+                    {
+                        title: 'Scheduled Time',
+                        field: row => helper.dateFormat(row.ScheduledTime)
+                    },
+                    {
+                        title: 'Start Time',
+                        field: row => helper.dateFormat(row.StartTime)
+                    },
+                    {
+                        title: 'Minutes',
+                        field: row => {
+                            if (row.State == 0 || row.State == 1) {
+                                return row.ElapsedMin
+                            }
+                            if (row.ElapsedMin > 120 && row.ElapsedMin < 300) {
+                                return helper.badge('warning', row.ElapsedMin)
+                            }
+                            else if (row.ElapsedMin >= 300) {
+                                return helper.badge('danger', row.ElapsedMin)
+                            }
+                            else {
+                                return row.ElapsedMin
+                            }
+                        }
+                    },
+                    {
+                        title: 'Stop Time',
+                        field: row => helper.dateFormat(row.StopTime)
+                    },
+                    {
+                        title: 'Job Counter',
+                        field: 'JobCounter'
+                    },
+                    {
+                        title: 'Errors',
+                        field: row => {
+                            if (row.NumErrors > 0) {
+                                return helper.badge('danger', row.NumErrors)
+                            }
+
+                            return row.NumErrors
+                        }
+                    },
+                    {
+                        title: 'Tries',
+                        field: 'NumTries'
+                    },
+                    {
+                        title: 'Entries',
+                        field: 'NumEntries'
+                    },
+                    {
+                        title: 'Current',
+                        field: 'CurrentEntry'
+                    }
+                ]
+            }
+        })
+    </script>
+<% } %>

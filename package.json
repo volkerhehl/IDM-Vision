@@ -1,6 +1,6 @@
 {
   "name": "IDM-Vision",
-  "version": "0.9.5",
+  "version": "0.9.7",
   "description": "SAP IDM Content Monitoring",
   "main": "app.js",
   "scripts": {

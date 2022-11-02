@@ -9,8 +9,7 @@ Licence: MIT
 
 * Windows (other OS may work too)
 * Git: [https://git-scm.com/downloads](https://git-scm.com/downloads)
-* Node.js V12: [https://nodejs.org/en/download/releases/](https://nodejs.org/en/download/releases/)  
-  (other versions may work too - V14 currently don't work with the ***node-sspi*** module, if you need V14 but no AD user authentication, delete ```node-sspi``` from ```package.json``` before ```npm install```)
+* Node.js V12: [https://nodejs.org/en/download/releases/](https://nodejs.org/en/download/releases/) (other versions may work too - V14 currently don't work with the ***node-sspi*** module, if you need V14 but no AD user authentication, delete ```node-sspi``` from ```package.json``` before ```npm install```)
 * Node.js build tool chain: check "Tools for Native Modules" during Node.js setup
 * SAP IDM V7.2 or V8 (other versions may work too)
 * Currently only MSSQL server supported!
@@ -52,6 +51,10 @@ idp:
     database: IDP_db
     user: IDP_user
     password: password***
+
+    # Depending on the server configuration, you may need to add this:
+    options:
+      encrypt: true
 ```
 
 ### Run

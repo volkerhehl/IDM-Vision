@@ -1,0 +1,140 @@
+<% if (plugin.execStates) { %>
+    <div class="row">
+        <div class="col">
+            <h4>Orphan, failed and pending links</h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col" id="vue-summary2">
+            <h5>2 days</h5>
+            <tooled-table :rows="rows" :columns="columns" :nofilters="true"></tooled-table>
+            <% if (plugin.days != 2) { %>
+                <a class="btn btn-primary" href="?days=2" role="button">Show entries</a>
+            <% } %>
+        </div>
+        <div class="col-1">
+        </div>
+        <div class="col" id="vue-summary7">
+            <h5>7 days</h5>
+            <tooled-table :rows="rows" :columns="columns" :nofilters="true"></tooled-table>
+            <% if (plugin.days != 7) { %>
+                <a class="btn btn-primary" href="?days=7" role="button">Show entries</a>
+            <% } %>
+        </div>
+        <div class="col-1">
+        </div>
+        <div class="col" id="vue-summary-all">
+            <h5>All time</h5>
+            <tooled-table :rows="rows" :columns="columns" :nofilters="true"></tooled-table>
+            <% if (plugin.days != 0) { %>
+                <a class="btn btn-primary" href="?days=0" role="button">Show entries</a>
+            <% } %>
+        </div>
+    </div>
+
+    <hr/>
+
+    <div class="row">
+        <div class="col" id="vue-entries">
+            <h5>Entries (<%= plugin.days == 0 ? 'all time' : plugin.days + ' days' %>)</h5>
+            <tooled-table :rows="rows" :columns="columns"></tooled-table>
+        </div>
+    </div>
+
+    <script>
+        var summary2 = <%- JSON.stringify(plugin.summary2) %>
+        var summary7 = <%- JSON.stringify(plugin.summary7) %>
+        var summaryAll = <%- JSON.stringify(plugin.summaryAll) %>
+        var execStates = <%- JSON.stringify(plugin.execStates) %>
+    </script>
+
+    <script>
+        var summaryColumns = [
+            {
+                title: 'Exec State',
+                field: row => row.estate == -9999 ? 'ORPHAN' : helper.execStateName(row.estate)
+            },
+            {
+                title: 'Counts',
+                field: row => helper.badge(row.estate == -9999 ? 'danger' : helper.execStateColor(row.estate), row.cnt)
+            }
+        ]
+
+        var vappSummary2 = new Vue({
+            el: '#vue-summary2',
+
+            data: {
+                rows: summary2,
+                columns: summaryColumns
+            }
+        })
+
+        var vappSummary7 = new Vue({
+            el: '#vue-summary7',
+
+            data: {
+                rows: summary7,
+                columns: summaryColumns
+            }
+        })
+
+        var vappSummaryAll = new Vue({
+            el: '#vue-summary-all',
+
+            data: {
+                rows: summaryAll,
+                columns: summaryColumns
+            }
+        })
+
+        var entryColumns = [
+            {
+                title: 'Entrytype',
+                field: 'type'
+            },
+            {
+                title: 'MSKV',
+                field: row => helper.makeMskeyLink(row.msk, row.mskv, '/int-entry-relations')
+            },
+            {
+                title: 'Displayname',
+                field: 'dn'
+            },
+            {
+                title: 'ORPHAN',
+                field: row => row.orphan == 0 ? '' : helper.badge('danger', row.orphan)
+            },
+            {
+                title: 'FAILED',
+                field: row => row.failed == 0 ? '' : helper.badge('danger', row.failed)
+            },
+            {
+                title: 'PENADD',
+                field: row => row.penadd == 0 ? '' : helper.badge('warning', row.penadd)
+            },
+            {
+                title: 'PENDEL',
+                field: row => row.pendel == 0 ? '' : helper.badge('warning', row.pendel)
+            }
+        ]
+
+        if (execStates.reduce(function(acc, curr) { return acc + curr.partok }, 0) > 0) {
+            entryColumns.push(
+                {
+                    title: 'PARTIAL',
+                    field: row => row.partok == 0 ? '' : helper.badge('danger', row.partok)
+                }
+            )
+        }
+
+        var vappEntries = new Vue({
+            el: '#vue-entries',
+
+            data: {
+                rows: execStates,
+                columns: entryColumns
+            }
+        })
+    </script>
+<% } %>

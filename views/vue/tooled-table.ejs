@@ -81,6 +81,7 @@
             csvexport: null,
             csvtimestamp: null,
             polling: Boolean,
+            nofilters: Boolean,
             rightadd: null
         },
 
@@ -93,7 +94,7 @@
             var hiddenColumns = []
 
             this.columns.forEach(col => {
-                if (this.polling) {
+                if (this.polling | this.nofilters) {
                     col.filter = false
                 }
                 else if (typeof col.filter === 'number') {

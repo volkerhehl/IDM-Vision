@@ -1,5 +1,20 @@
 <% if (plugin.fromEntry) { %>
     <div class="row">
+      <div class="col">
+        <% if (plugin.from.invRef || plugin.to.invRef) { %>
+            <div class="alert alert-dismissible alert-danger">
+              Broken references! Check <strong>reftypes</strong>.
+            </div>
+        <% } %>
+        <% if (plugin.from.badExec || plugin.to.badExec) { %>
+            <div class="alert alert-dismissible alert-warning">
+              Note pending or failed <strong>exec states</strong>.
+            </div>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="row">
       <div class="col" id="from-entry-table">
         <h5>From this entry</h5>
         <tooled-table :rows="rows" :columns="columns" :rightadd="rightadd"></tooled-table>
@@ -9,6 +24,11 @@
     <div class="row">
       <div class="col" id="to-entry-table">
         <h5>To this entry</h5>
+        <% if (plugin.requestCount == 3000) { %>
+            <div class="alert alert-dismissible alert-warning">
+              Request objects (RQ:) are limited to 3000!
+            </div>
+        <% } %>
         <tooled-table :rows="rows" :columns="columns" :rightadd="rightadd"></tooled-table>
       </div>
     </div>
@@ -21,71 +41,6 @@
     </script>
 
     <script>
-        function unistate(state) {
-            return state > 1023 ? state - 1024 : state
-        }
-
-
-        function linkStateName(state) {
-            const ustate = unistate(state)
-            const pending = state > 1023 ? 'PENDEL: ' + state : 'PENADD: ' + state
-
-            switch (ustate) {
-                case 0: return 'OKAY: ' + state
-                case 1: return 'OK: ' + state
-                case 2: return 'REJECT: ' + state
-                case 4: return 'FAIL: ' + state
-                case 512: return pending
-                default: return '???: ' + state
-            }
-        }
-
-
-        function execStateName(state) {
-            const ustate = unistate(state)
-            const pending = state > 1023 ? 'PENDEL: ' + state : 'PENADD: ' + state
-
-            switch (ustate) {
-                case 0: return 'OKAY: ' + state
-                case 1: return 'OK: ' + state
-                case 2: return 'REJECT: ' + state
-                case 3: return 'PARTOK: ' + state
-                case 4:
-                case 5:
-                case 6:
-                case 7: return 'FAIL: ' + state
-                case 512:
-                case 513:
-                case 514:
-                case 515:
-                case 516:
-                case 517:
-                case 518:
-                case 519: return pending
-                default: return '???: ' + state
-            }
-        }
-
-
-        function stateBadgeColor(state) {
-            const ustate = unistate(state)
-            if (ustate < 2) { return 'success' }
-            if (ustate > 3 && ustate < 512) { return 'danger' }
-            return 'warning'
-        }
-
-
-        function linkStateBadge(row) {
-            const state = Number(row.mcLinkState)
-            return helper.badge(stateBadgeColor(state), linkStateName(state))
-        }
-
-
-        function execStateBadge(row) {
-            const state = Number(row.mcExecState)
-            return helper.badge(stateBadgeColor(state), execStateName(state))
-        }
-
         function refCounter(row) {
             let result = []
 
@@ -103,6 +58,14 @@
 
             if (row.mcAssignedInheritCount > 0) {
                 result.push(build('inh', row.mcAssignedInheritCount))
+            }
+
+            if (row.mcOrphan > 0) {
+                result.push(helper.badge('danger', 'ORPHAN'))
+            }
+
+            if (result.length == 0) {
+                result.push(helper.badge('danger', 'NO REF!'))
             }
 
             return result.join(' ')
@@ -186,12 +149,16 @@
                         field: row => helper.makeProcessInfoLink(row.mcProcessInfo)
                     },
                     {
+                        title: 'Reason',
+                        field: 'mcReason'
+                    },
+                    {
                         title: 'Link',
-                        field: row => linkStateBadge(row)
+                        field: row => helper.linkStateBadge(row.mcLinkState)
                     },
                     {
                         title: 'Exec',
-                        field: row => execStateBadge(row)
+                        field: row => helper.execStateBadge(row.mcExecState)
                     }
                 ]
             }
@@ -274,12 +241,16 @@
                         field: row => helper.makeProcessInfoLink(row.mcProcessInfo)
                     },
                     {
+                        title: 'Reason',
+                        field: 'mcReason'
+                    },
+                    {
                         title: 'Link',
-                        field: row => linkStateBadge(row)
+                        field: row => helper.linkStateBadge(row.mcLinkState)
                     },
                     {
                         title: 'Exec',
-                        field: row => execStateBadge(row)
+                        field: row => helper.execStateBadge(row.mcExecState)
                     }
                 ]
             }

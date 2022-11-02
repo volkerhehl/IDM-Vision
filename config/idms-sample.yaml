@@ -8,6 +8,9 @@ idp:
     database: IDP_db
     user: IDP_user
     password: password***
+    # Depending on the server configuration, you may need to add this:
+    options:
+      encrypt: true
 
 # idd:
 #   name: IDD
@@ -19,3 +22,5 @@ idp:
 #     database: IDD_db
 #     user: IDD_user
 #     password: password***
+#     options:
+#       encrypt: true

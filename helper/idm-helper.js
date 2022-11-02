@@ -57,13 +57,13 @@
         }
 
 
-        helper.makeMskeyLink = function(mskey, text) {
-            return mskey && text ? helper.makeLink(helper.mskeyURL(mskey), text) : ''
+        helper.makeMskeyLink = function(mskey, text, add = '') {
+            return mskey && text ? helper.makeLink(helper.mskeyURL(mskey) + add, text) : ''
         }
 
 
-        helper.makeMskeyLinkInline = function(mskey, text) {
-            return mskey && text ? helper.makeLinkInline(helper.mskeyURL(mskey), text) : ''
+        helper.makeMskeyLinkInline = function(mskey, text, add = '') {
+            return mskey && text ? helper.makeLinkInline(helper.mskeyURL(mskey) + add, text) : ''
         }
 
 

@@ -131,6 +131,7 @@ module.exports = {
             returnData.job = {
                 name:job.Name,
                 id: job.JobId,
+                rule: job.rule,
                 location: jobLocation
             }
         }
@@ -150,6 +151,8 @@ module.exports = {
         if (taskList.length > 1) {
             returnData.taskList = taskList
         }
+
+        // logger.debugJSON(returnData)
 
         return returnData
     }

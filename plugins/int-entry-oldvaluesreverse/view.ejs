@@ -30,6 +30,36 @@
         return helper.makeJobTaskIdLink(row.AuditTaskId, text)
     }
 
+    function refCounter(row) {
+        let result = []
+
+        function build(name, number) {
+            return '(' + name + ': ' + number + ')'
+        }
+
+        if (row.mcAssignedDirect > 0) {
+            result.push(build('dir', row.mcAssignedDirect))
+        }
+
+        if (row.mcAssignedDynamicGroup > 0) {
+            result.push(build('dg', row.mcAssignedDynamicGroup))
+        }
+
+        if (row.mcAssignedInheritCount > 0) {
+            result.push(build('inh', row.mcAssignedInheritCount))
+        }
+
+        if (row.mcOrphan > 0) {
+            result.push(helper.badge('danger', 'ORPHAN'))
+        }
+
+        if (result.length == 0) {
+            result.push('')
+        }
+
+        return result.join(' ')
+    }
+
     var vapp = new Vue({
         el: '#vue-app',
         data: {
@@ -62,6 +92,10 @@
                 {
                     title: 'Attribute',
                     field: 'AttrName'
+                },
+                {
+                    title: 'Reftype',
+                    field: row => refCounter(row)
                 },
                 {
                     title: 'Operation',

@@ -26,8 +26,87 @@
             return '<span class="badge badge-' + color + '">' + text + '</span>'
         }
 
+
+        helper.unistate = function(state) {
+            state = Number(state)
+            return state > 1023 ? state - 1024 : state
+        }
+
+
+        helper.linkStateName = function(state) {
+            const ustate = helper.unistate(state)
+            const pending = state > 1023 ? 'PENDEL: ' + state : 'PENADD: ' + state
+
+            switch (ustate) {
+                case 0: return 'OKAY: ' + state
+                case 1: return 'OK: ' + state
+                case 2: return 'REJECT: ' + state
+                case 4: return 'FAIL: ' + state
+                case 512: return pending
+                default: return '???: ' + state
+            }
+        }
+
+
+        helper.execStateName = function(state) {
+            const ustate = helper.unistate(state)
+            const pending = state > 1023 ? 'PENDEL: ' + state : 'PENADD: ' + state
+
+            switch (ustate) {
+                case 0: return 'OKAY: ' + state
+                case 1: return 'OK: ' + state
+                case 2: return 'REJECT: ' + state
+                case 3: return 'PARTIAL: ' + state
+                case 4:
+                case 5:
+                case 6:
+                case 7: return 'FAILED: ' + state
+                case 512:
+                case 513:
+                case 514:
+                case 515:
+                case 516:
+                case 517:
+                case 518:
+                case 519: return pending
+                default: return '???: ' + state
+            }
+        }
+
+
+        helper.linkStateColor = function(state) {
+            const ustate = helper.unistate(state)
+            if (ustate < 2) { return 'success' }
+            if (ustate > 3 && ustate < 512) { return 'danger' }
+            return 'warning'
+        }
+
+
+        helper.execStateColor = function(state) {
+            const ustate = helper.unistate(state)
+            if (ustate < 2) { return 'success' }
+            if (ustate > 3 && ustate < 512) { return 'danger' }
+            return 'warning'
+        }
+
+
+        helper.linkStateBadge = function(state) {
+            return helper.badge(helper.linkStateColor(state), helper.linkStateName(state))
+        }
+
+
+        helper.execStateBadge = function(state) {
+            return helper.badge(helper.execStateColor(state), helper.execStateName(state))
+        }
+
+
         helper.spanClass = function(clas, text) {
             return '<span class="' + clas + '">' + text + '</span>'
+        }
+
+
+        helper.spanColor = function(color, text) {
+            return helper.spanClass('text-' + color, text)
         }
 
 
@@ -35,9 +114,10 @@
             name = name ? name : status
             status = Number(status)
             let color = 'danger'
-            if ([0, 21, 1000, 1100].includes(status)) { color = 'success' }
+            if ([0, 1000, 1100].includes(status)) { color = 'success' }
             if (status == -1) { color = 'warning' }
             if (status == 20) { color = 'info' }
+            if (status == 21) { color = 'info' }
             return helper.badge(color, name)
         }
 

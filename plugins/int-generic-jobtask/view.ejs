@@ -47,6 +47,9 @@
           <p>
             <span class="text-success"><%= plugin.job.id %></span> / <span class="text-info"><%= plugin.job.name %></span>
           </p>
+          <p>
+            <strong>Schedule Rule:</strong> <%= plugin.job.rule %>
+          </p>
           <p>Location<br/>
             <% for (let i in plugin.job.location) { %>
               <% for (let ii = 0; ii < i; ii++) { %>

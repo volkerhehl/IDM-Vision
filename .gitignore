@@ -80,3 +80,5 @@ config/idms.yaml
 config/main.yaml
 checks/
 __*
+
+.DS_Store

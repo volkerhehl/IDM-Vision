@@ -17,6 +17,13 @@ module.exports = {
         const relations = await query('relations', { mskey: entry.mskey, logon_alias_attr: logonAliasAttr, sam_account_attr: samAccountAttr })
         const fromEntry = relations.filter(r => r.direction == 'from')
         const toEntry = relations.filter(r => r.direction == 'to')
+        const requestCount = relations.filter(r => r.direction == 'to' && r.MSKEYVALUE.length > 2 && r.MSKEYVALUE.substr(0,3) == 'RQ:').length
+        let from = {}
+        let to = {}
+        from.invRef = fromEntry.filter(r => r.mcAssignedDirect < 1 && r.mcAssignedDynamicGroup < 1 && r.mcAssignedInheritCount < 1).length > 0
+        to.invRef = toEntry.filter(r => r.mcAssignedDirect < 1 && r.mcAssignedDynamicGroup < 1 && r.mcAssignedInheritCount < 1).length > 0
+        from.badExec = fromEntry.filter(r => (r.mcExecState != 0 && r.mcExecState != 1)).length > 0
+        to.badExec = toEntry.filter(r => (r.mcExecState != 0 && r.mcExecState != 1)).length > 0
 
         if (compareEntry) {
             compareTag = compareTag ? compareTag : 'from'
@@ -43,7 +50,10 @@ module.exports = {
 
         return {
             fromEntry,
-            toEntry
+            toEntry,
+            from,
+            to,
+            requestCount
         }
     }
 }

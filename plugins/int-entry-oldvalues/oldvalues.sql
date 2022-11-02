@@ -13,7 +13,11 @@ t1.AuditId,
 t1.Modifytime,
 t1.ChangedBy,
 t1.UserID,
-t1.aValue
+t1.aValue,
+t1.mcAssignedDirect,
+t1.mcAssignedDynamicGroup,
+t1.mcAssignedInheritCount,
+t1.mcOrphan
 FROM idmv_ovalue_basic_all AS t1 WITH(nolock)
 LEFT JOIN idmv_entry_simple AS t2 WITH(nolock)
     ON CASE
